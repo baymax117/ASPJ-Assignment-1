@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title 1 Hi </title>
+    <title>{% block title %}CB Shop{% endblock %}</title>
+    {% block style %}
+    {% endblock %}
 </head>
 <body>
-
+    {% block content %}
+    {% endblock %}
+    {% block function %}
+    {% endblock %}
 </body>
 </html>
