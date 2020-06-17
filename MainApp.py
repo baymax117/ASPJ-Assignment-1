@@ -10,11 +10,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'sh
 db = SQLAlchemy(app)
 
 
-@app.cli.command('hello')
-def greet():
-    print('hi')
-
-
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -28,12 +23,6 @@ def login():
 @app.route('/signup')
 def signup():
     return render_template('signup.html')
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
