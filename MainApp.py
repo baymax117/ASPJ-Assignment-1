@@ -1,26 +1,23 @@
-from flask import Flask, render_template , redirect, flash, url_for, request
+from flask import Flask, render_template, redirect, flash, url_for, request
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import ValidationError, InputRequired, Email, EqualTo, Length
-
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField
+from wtforms.validators import ValidationError, InputRequired, Email, EqualTo, Length, NumberRange
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager , logout_user, current_user, login_user, UserMixin
+from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 
+# from Database import User
+# from signupForm import CreateUserForm
 
-#from Database import User
-#from signupForm import CreateUserForm
 
 from sqlalchemy import Column, Integer, String, Float, Boolean
-from werkzeug.security import generate_password_hash , check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
-
-
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
-#SECRET_KEY = os.environ.get('SECRET_KEY') or "asp-project-security"
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
+# SECRET_KEY = os.environ.get('SECRET_KEY') or "asp-project-security"
 app.config['SECRET_KEY'] = "asp-project-security"
 
 db = SQLAlchemy(app)
@@ -38,34 +35,59 @@ class User(db.Model):
     email = Column(String(120), index=True, unique=True)
     password = Column(String(128))
 
+
+class Payment(db.Model):
+    __tablename__ = 'cards'
+
+    name = Column(String(150), primary_key=True)
+
+
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
 
 class UserLoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=70)])
     remember_me = BooleanField('Remember Me')
-    #submit = SubmitField('Sign In')
+    # submit = SubmitField('Sign In')
 
 
 class CreateUserForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15) ])
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
     email = StringField('Email', validators=[InputRequired(), Email(message="Invalid Email"), Length(max=60)])
     password = PasswordField('Password', validators=[InputRequired()])
-    #confirmPassword = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password')])
-    #submit = SubmitField('Sign up!')
+    # confirmPassword = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password')])
+    # submit = SubmitField('Sign up!')
 
-#Add  @login_required to protect against anonymous users to view a function,
-#Put below @app.route, will prevent them from accessing this function
+
+class PaymentForm(FlaskForm):
+    name = StringField('Name', validators=[InputRequired(), Length(min=1, max=150)])
+    email = StringField('Email', validators=[InputRequired(), Length(min=1, max=150)])
+    address = StringField('Address', validators=[InputRequired(), Length(min=1, max=150)])
+    country = StringField('Country', validators=[InputRequired(), Length(min=1, max=150)])
+    city = StringField('City', validators=[InputRequired(), Length(min=1, max=150)])
+    zip = IntegerField('Zip', validators=[InputRequired(), NumberRange(min=100000, max=999999)])
+    cardName = StringField('Name on card', validators=[InputRequired(), Length(min=1, max=150)])
+    cardNum = IntegerField('Credit card number', validators=[InputRequired()])
+    expmonth = SelectField('Exp month', validators=[InputRequired()],
+                           choices=[('January', 'January'), ('February', 'February'), ('March', 'March'),
+                                    ('April', 'April'), ('May', 'May'), ('June', 'June'), ('July', 'July'),
+                                    ('August', 'August'), ('September', 'September'), ('October', 'October'),
+                                    ('November', 'November'), ('December', 'December')])
+    expyear = IntegerField('Exp year', validators=[InputRequired(), NumberRange(min=2020, max=3000)])
+    cvv = IntegerField('CVV', validators=[InputRequired(), NumberRange(min=0, max=999)])
+    # rmb = BooleanField('')
+
+
+# Add  @login_required to protect against anonymous users to view a function,
+# Put below @app.route, will prevent them from accessing this function
 
 @app.route('/')
-
 @app.route('/home')
 def home():
     return render_template('home.html')
-
-
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -76,8 +98,8 @@ def login():
     form = UserLoginForm()
 
     if form.validate_on_submit():
-        user = User.query.filter_by(username = form.username.data).first()
-        #if user is None or not user.check_password(form.password.data):
+        user = User.query.filter_by(username=form.username.data).first()
+        # if user is None or not user.check_password(form.password.data):
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember_me.data)
@@ -85,12 +107,14 @@ def login():
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
 
-    return render_template('login.html', form=form , title="Login in")
+    return render_template('login.html', form=form, title="Login in")
+
 
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for("home"))
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -107,6 +131,7 @@ def signup():
         flash("You have successfully signed up!")
         return redirect(url_for('login'))
     return render_template('sign up.html', title="Sign Up", form=form)
+
 
 def db_create():
     db.create_all()
@@ -141,9 +166,6 @@ def db_seed():
     print('database seeded')
 
 
-
-
-
 # run db_create to initialize the database
 # db_create()
 
@@ -152,12 +174,6 @@ def db_seed():
 
 # run db_drop to reset the database
 # db_drop()
-
-
-
-
-
-
 
 
 # @app.cli.command('db_create')
@@ -173,7 +189,7 @@ def db_seed():
 #     db_seed()
 
 
-#database_create()
+# database_create()
 
 
 if __name__ == "__main__":
