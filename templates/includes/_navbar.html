@@ -1,10 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!-- A grey horizontal navbar that becomes vertical on small screens -->
+<nav class="navbar navbar-expand-sm bg-light" >
 
-</body>
-</html>
+  <!-- Links -->
+  <ul class="navbar-nav">
+    <li class="nav-item">
+      <a class="nav-link" href="/">Home</a>
+    </li>
+    {% if current_user.is_anonymous %}
+    <li class="nav-item">
+      <a class="nav-link" href="/login">Login</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href='/signup'>Sign Up</a>
+    </li>
+    {% else %}
+    <li class="nav-item">
+      <a class="nav-link" href="/logout">Sign out</a>
+    </li>
+    {% endif %}
+  </ul>
+<nav class="navbar navbar-dark navbar-expand-md bg-dark justify-content-center">
+    <a href="/" class="navbar-brand d-flex w-50 mr-auto">Circuit Breaker Shop</a>
+    <form class="form-inline my-2 my-lg-0 px-auto">
+      <input class="form-control pr-auto" style="width:500px" type="search" placeholder="Search for products..." name="q" aria-label="Search">
+    </form>
+    <ul class="nav navbar-nav ml-auto w-100 justify-content-end">
+        <li class="nav-item">
+            <a class="nav-link" href="#">Login</a>
+        </li>
+    </ul>
+</nav>
