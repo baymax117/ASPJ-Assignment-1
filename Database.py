@@ -63,14 +63,14 @@ def db_seed():
                                product_description='2 ply toilet paper for your toilet business.',
                                product_stock=20)
 
-    toilet_paper_3py = Product(product_id=78,
+    toilet_paper_3py = Product(product_id=8,
                                product_name='Toilet Paper 3ply 10pcs',
                                product_type='Paper and Tissue',
                                product_price=8.50,
                                product_stock=20.00,
                                product_description='3 ply toilet paper for your toilet business.')
 
-    toilet_paper_4py = Product(product_id=7,
+    toilet_paper_4py = Product(product_id=9,
                                product_name='Toilet Paper 4ply 10pcs',
                                product_type='Paper and Tissue',
                                product_price=10.50,

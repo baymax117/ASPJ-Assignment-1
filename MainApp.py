@@ -5,21 +5,18 @@ from wtforms.validators import ValidationError, InputRequired, Email, EqualTo, L
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager , logout_user, current_user, login_user, UserMixin
 from uuid import uuid4
-
-#from Database import User
-#from signupForm import CreateUserForm
-
+# from Database import User
+# from signupForm import CreateUserForm
 from sqlalchemy import Column, Integer, String, Float, Boolean
 from werkzeug.security import generate_password_hash , check_password_hash
 import os
 
 
-
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
-#SECRET_KEY = os.environ.get('SECRET_KEY') or "asp-project-security"
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
+# SECRET_KEY = os.environ.get('SECRET_KEY') or "asp-project-security"
 app.config['SECRET_KEY'] = "asp-project-security"
 
 db = SQLAlchemy(app)
@@ -50,10 +47,8 @@ class User(db.Model):
         return False
 
 
-
 class Payment(db.Model):
     __tablename__ = 'cards'
-
     name = Column(String(150))
     email = Column(String(120), unique=True)
     address = Column(String(150))
@@ -68,15 +63,10 @@ class Payment(db.Model):
 
 
 
-
-
-
-
-
-
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
 
 class UserLoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
@@ -85,12 +75,13 @@ class UserLoginForm(FlaskForm):
     #submit = SubmitField('Sign In')
 
 
+
 class CreateUserForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15) ])
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
     email = StringField('Email', validators=[InputRequired(), Email(message="Invalid Email"), Length(max=60)])
     password = PasswordField('Password', validators=[InputRequired()])
-    #confirmPassword = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password')])
-    #submit = SubmitField('Sign up!')
+    # confirmPassword = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password')])
+    # submit = SubmitField('Sign up!')
 
 
 class PaymentForm(FlaskForm):
@@ -165,8 +156,8 @@ def login():
     form = UserLoginForm()
 
     if form.validate_on_submit():
-        user = User.query.filter_by(username = form.username.data).first()
-        #if user is None or not user.check_password(form.password.data):
+        user = User.query.filter_by(username=form.username.data).first()
+        # if user is None or not user.check_password(form.password.data):
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember_me.data)
@@ -179,12 +170,14 @@ def login():
         flash("Invalid username or password, please try again!")
         return redirect(url_for('protected'))
 
-    return render_template('login.html', form=form , title="Login in")
+    return render_template('login.html', form=form, title="Login in")
+
 
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for("home"))
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -206,6 +199,7 @@ def signup():
 def payment():
     form = PaymentForm()
     return render_template('payment.html', title='Payment', form=form)
+
 
 def db_create():
     db.create_all()
@@ -240,23 +234,15 @@ def db_seed():
     print('database seeded')
 
 
-
-
-
 # run db_create to initialize the database
 # db_create()
 
 # run db_seed to create sample data in the database
 # db_seed()
 
+
 # run db_drop to reset the database
 # db_drop()
-
-
-
-
-
-
 
 
 # @app.cli.command('db_create')
@@ -272,7 +258,8 @@ def db_seed():
 #     db_seed()
 
 
-#database_create()
+# database_create()
+
 
 
 if __name__ == "__main__":
