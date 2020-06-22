@@ -1,10 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %} Login {% endblock %}
+{% from "includes/_formHelper.html" import render_field %}
 
-</body>
-</html>
+{% block content %}
+<form method="POST" action="" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }} <br>
+            {{ form.username(size=32) }} <br>
+            {% for error in form.username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password.label }} <br>
+            {{ form.password(size=32) }} <br>
+            {% for error in form.password.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <button type="submit">login!</button>
+
+        <p>
+            Not registered? <a href="{{ url_for('signup') }}">Sign up here!</a>
+        </p>
+
+</form>
+{% endblock %}
+
+
