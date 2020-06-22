@@ -1,64 +1,97 @@
 {% extends "base.html" %}
 {% block title %}payment page{% endblock %}
-{% block style %}
 
-{% block content %}
+
+
 {% from "includes/_formHelper.html" import render_field %}
+{% block content %}
 
+<h1>Payment form</h1>
 
 <form method ="POST" action="" style="margin:auto;border-style:solid;border-width:1px;border-radius:5px;width:40%;margin-bottom:20px;margin-top: 20px;">
-    <div style="text-align:left;margin:auto;padding-left:20%;padding-right:20%;padding-bottom:10%;margin-bottom:5%;">
-        <h3 style="margin-top:30px;">Billing Address</h3><br>
-        <div class="form-group">
-        {{ render_field(form.name, class="form-control") }}
-        </div>
-        <div class="form-group">
-        {{ render_field(form.email, class="form-control") }}
-        </div>
-        <div class="form-group">
-        {{ render_field(form.address, class="form-control") }}
-        </div>
-        <div class="form-group">
-        {{ render_field(form.country, class="form-control") }}
-        </div>
-        <div class="form-group">
-        {{ render_field(form.city, class="form-control") }}
-        </div>
-        <div class="form-group">
-        {{ render_field(form.zip, class="form-control") }}
-        </div>
+    {{ form.hidden_tag() }}
+    <h3 style="margin-top:30px;">Billing Address</h3><br>
+    <p>
+        {{ form.name.label }} <br>
+        {{ form.name(size=70) }} <br>
+        {% for error in form.name.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.email.label }} <br>
+        {{ form.email(size=70) }} <br>
+        {% for error in form.email.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.address.label }} <br>
+        {{ form.address(size=70) }} <br>
+        {% for error in form.address.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.country.label }} <br>
+        {{ form.country(size=70) }} <br>
+        {% for error in form.country.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.city.label }} <br>
+        {{ form.city(size=70) }} <br>
+        {% for error in form.city.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.zip.label }} <br>
+        {{ form.zip(size=6) }} <br>
+        {% for error in form.zip.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
 
-        <h3>Payment</h3><br>
-        <div>Accepted Cards</div>
-        <div class="icon-container">
-          <i class="fa fa-cc-visa" style="color:navy;"></i>
-          <i class="fa fa-cc-amex" style="color:blue;"></i>
-          <i class="fa fa-cc-mastercard" style="color:red;"></i>
-          <i class="fa fa-cc-discover" style="color:orange;"></i>
-        </div><br>
-        <div class="form-group">
-        {{ render_field(form.cardName, class="form-control") }}
-        </div>
-        <div class="form-group">
-        {{ render_field(form.cardNum, class="form-control") }}
-        {% if invalid == 'Invalid card' %}
-            <span style="color:red;">{{ invalid }}</span>
-        {% endif %}
-        </div>
-        <div class="form-group">
-        {{ render_field(form.expmonth, class="form-control") }}
-        </div>
-        <div class="form-group">
-        {{ render_field(form.expyear, class="form-control") }}
-        </div>
-        <div class="form-group">
-        {{ render_field(form.cvv, class="form-control") }}
-        </div>
-        <div class="form-group">
-        {{ render_field(form.rmb, class="form-control",style="height:13px;width:13px;display:inline;") }}Remember me
-        </div>
-        <input type="submit" value="Submit" class="btn btn-primary"/>
-    </div>
+    <h3 style="margin-top:30px;">Payment</h3><br>
+
+    <p>
+        {{ form.cardName.label }} <br>
+        {{ form.cardName(size=70) }} <br>
+        {% for error in form.cardName.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.cardNum.label }} <br>
+        {{ form.cardNum(size=30) }} <br>
+        {% for error in form.cardNum.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.expmonth.label }} <br>
+        {{ form.expmonth(size=10) }} <br>
+        {% for error in form.expmonth.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.expyear.label }} <br>
+        {{ form.expyear(size=4) }} <br>
+        {% for error in form.expyear.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.cvv.label }} <br>
+        {{ form.cvv(size=3) }} <br>
+        {% for error in form.cvv.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <button type="submit">Submit</button>
 
 </form>
 
