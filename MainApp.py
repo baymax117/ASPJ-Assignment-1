@@ -81,10 +81,8 @@ class PaymentForm(FlaskForm):
     # rmb = BooleanField('')
 
 
-
 # Add  @login_required to protect against anonymous users to view a function,
 # Put below @app.route, will prevent them from accessing this function
-
 
 
 @app.route('/')
@@ -194,7 +192,6 @@ def db_seed():
 
 
 # database_create()
-
 
 
 if __name__ == "__main__":
