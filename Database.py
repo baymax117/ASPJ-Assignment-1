@@ -1,6 +1,8 @@
-from MainApp import db
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Float
+
+
+db = SQLAlchemy()
 
 
 def db_create():
@@ -121,10 +123,38 @@ class Product(db.Model):
 
 class User(db.Model):
     __tablename__ = 'users'
+
     user_id = Column(Integer, primary_key=True)
-    username = Column(String)
-    email = Column(String)
-    password = Column(String)
+    username = Column(String(64))
+    email = Column(String(120), index=True, unique=True)
+    password = Column(String(128))
+
+    def is_active(self):
+        return True
+
+    def is_authenticated(self):
+        return True
+
+    def get_id(self):
+        return self.user_id
+
+    def is_anonymous(self):
+        return False
+
+
+class Payment(db.Model):
+    __tablename__ = 'cards'
+    name = Column(String(150))
+    email = Column(String(120), unique=True)
+    address = Column(String(150))
+    country = Column(String(56))
+    city = Column(String(150))
+    zip = Column(Integer)
+    cardname = Column(String(150))
+    cardnum = Column(Integer, primary_key=True)
+    expmonth = Column(String(9))
+    expyear = Column(Integer)
+    cvv = Column(Integer)
 
 # run db_create to initialize the database
 # db_create()
