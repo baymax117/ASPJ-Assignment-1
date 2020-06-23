@@ -41,7 +41,6 @@ div.overlay{
     bottom: 0;
     background-color: rgba(0,0,0,0.5);
     z-index: 2;
-    cursor: pointer;
 }
 
 div.overlay-item{
@@ -131,9 +130,14 @@ $(document).ready(function(){
         $(".overlay").show();
         for (product in data){
             if (data[product][0] == item){
-              $("#item-details").html('<span>' + data[product][0] + '</span><br><span>' + data[product][1] + '</span><br><span>Price: $' + data[product][2].toFixed(2) + "</span>");
-              $("#item-desc").text(data[product][3]);
-              $("#item-image").attr('src', '../static/img/' + data[product][4]);
+                $("#item-details").html('<span>' + data[product][0] + '</span><br><span>' + data[product][1] + '</span><br><span>Price: $' + data[product][2].toFixed(2) + "</span>");
+                $("#item-desc").text(data[product][3]);
+                if (data[product][4] != null){
+                    $("#item-image").attr('src', '../static/img/' + data[product][4]);
+                }
+                else{
+                    $("#item-image").attr('src', '../static/img/None.png');
+                }
             };
         };
     });

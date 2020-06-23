@@ -29,14 +29,16 @@ def db_seed(database):
                           product_type='Protective Clothing and Equipment',
                           product_price=5.50,
                           product_description='Reusable cloth mask to keep you protected when going out.',
-                          product_stock=80)
+                          product_stock=80,
+                          product_image="Black Cloth Mask.png")
 
     face_shield = Product(product_id=3,
                           product_name='Plastic Face Shield',
                           product_type='Protective Clothing and Equipment',
                           product_price=5.90,
                           product_description='Reusable face shield to keep you protected when going out.',
-                          product_stock=85)
+                          product_stock=85,
+                          product_image="Plastic Face Shield.png")
 
     small_hand_sanitiser = Product(product_id=4,
                                    product_name='Hand Sanitiser 50ml',
