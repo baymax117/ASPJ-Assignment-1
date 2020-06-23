@@ -1,15 +1,48 @@
 {% extends "base.html" %}
 {% block title %}Home Page{% endblock %}
 
+{% block style %}
+<style>
+div.item-container{
+    margin: 20px 20px;
+    padding: 20px 0px 40px 52.5px;
+    border: 1px #c2c2c238 solid;
+    border-radius: 5px;
+    background-color: WhiteSmoke;
+}
+
+span.item-name{
+    font-weight: bold;
+    word-wrap: break-word;
+    width: 150px
+}
+
+span.item-price{
+
+}
+</style>
+{% endblock %}
 
 {% block content %}
-{% for product in products %}
-<p>{{ product[0] }}</p>
-<p>{{ product[1] }}</p>
-<p>{{ product[2] }}</p>
-<p>{{ product[3] }}</p>
-<p>{{ product[4] }}</p>
-<p>{{ product[5] }}</p>
-<hr>
+
+<div class="row">
+<div class="col col-1"></div>
+{% for i in range(length) %}
+    <div class="col col-2 item-container">
+        <img src="../static/img/Surgical mask.png" class="item-picture">
+        <br>
+        <span class="item-name">{{ products[i][1] }}</span>
+        <br>
+        <span class="item-price">Price: {{ "${:.2f}".format(products[i][3]) }}</span>
+    </div>
+
+    {% if (i+1) % 4 == 0 and i != 0 %}
+    </div>
+    <div class="row">
+    <div class="col col-1"></div>
+    {% endif %}
+
 {% endfor %}
+</div>
+
 {% endblock %}

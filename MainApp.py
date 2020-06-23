@@ -46,7 +46,8 @@ def home():
     products = []
     for row in results:
         products.append(row)
-    return render_template('home.html', products=products)
+    length = len(products)
+    return render_template('home.html', products=products, length=length)
 
 
 @app.route('/protected_testing')
@@ -149,4 +150,4 @@ def payment():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
