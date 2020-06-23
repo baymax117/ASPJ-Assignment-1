@@ -16,7 +16,7 @@ div.item-container-active{
     padding: 20px 0px 40px 52.5px;
     border: 1px #c2c2c238 solid;
     border-radius: 5px;
-    background-color: Purple;
+    background-color: #7d7d7d;
     transform: scale(1.05);
 }
 
@@ -48,29 +48,45 @@ div.overlay-item{
     position: absolute;
     top: 50%;
     left: 50%;
-    font-size: 50px;
-    color: white;
+    color: black;
+    background-color: LightGrey;
+    border: 1px black solid;
+    border-radius: 15px;
+    padding: 5%;
     transform: translate(-50%,-50%);
     -ms-transform: translate(-50%,-50%);
+}
+
+img#item-image{
+    display:inline-block;
+    vertical-align: middle;
+}
+
+div#item-details{
+    display:inline-block;
+    vertical-align: middle;
+}
+
+div#item-details > span{
+    margin: 5px 0px;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-
 <div class="row">
 <div class="col col-1"></div>
 {% for i in range(length) %}
-    <div class="col col-2 item-container" id="{{ products[i][1] }}">
-        {% if products[i][6] is none %}
+    <div class="col col-2 item-container" id="{{ products[i][0] }}">
+        {% if products[i][4] is none %}
         <img src="../static/img/None.png" class="item-picture">
         {% else %}
-        <img src="../static/img/{{ products[i][6] }}" class="item-picture">
+        <img src="../static/img/{{ products[i][4] }}" class="item-picture">
         {% endif %}
         <br>
-        <span class="item-name">{{ products[i][1] }}</span>
+        <span class="item-name">{{ products[i][0] }}</span>
         <br>
-        <span class="item-price">Price: {{ "${:.2f}".format(products[i][3]) }}</span>
+        <span class="item-price">Price: {{ "${:.2f}".format(products[i][2]) }}</span>
     </div>
 
     {% if (i+1) % 4 == 0 and i != 0 %}
@@ -84,15 +100,21 @@ div.overlay-item{
 
 <div class="overlay">
     <div class="overlay-item">
-        <span id="item-name"></span>
+        <img src="" id="item-image">
+            <div id="item-details"></div>
+        <hr>
+        <span>Description:</span>
+        <p id="item-desc"></p>
+        <button class="btn btn-primary">Add To Cart</button>
     </div>
 </div>
 {% endblock %}
 
 {% block function %}
+<script src="../static/js/Shop.js"></script>
 <script>
+var data = CreateList()
 $(document).ready(function(){
-
     // "pop up" item when mouse enters the box
     $('.item-container').on('mouseenter', function(){
         $(this).addClass('item-container-active');
@@ -105,15 +127,23 @@ $(document).ready(function(){
 
     // show overlay when item is clicked
     $(".item-container").on('click', function(){
+        var item = $(this).attr('id');
         $(".overlay").show();
-        $("#item-name").text($(this).attr('id'))
+        for (product in data){
+            if (data[product][0] == item){
+              $("#item-details").html('<span>' + data[product][0] + '</span><br><span>' + data[product][1] + '</span><br><span>Price: $' + data[product][2].toFixed(2) + "</span>");
+              $("#item-desc").text(data[product][3]);
+              $("#item-image").attr('src', '../static/img/' + data[product][4]);
+            };
+        };
     });
 
     // hide overlay when overlay is clicked
     $(".overlay").on('click', function(){
         $(".overlay").hide();
-        $("#item-name").text('')
+        $("#item-name").text('');
     });
+
 })
 </script>
 {% endblock%}
