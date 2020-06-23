@@ -11,6 +11,15 @@ div.item-container{
     background-color: WhiteSmoke;
 }
 
+div.item-container-active{
+    margin: 20px 20px;
+    padding: 20px 0px 40px 52.5px;
+    border: 1px #c2c2c238 solid;
+    border-radius: 5px;
+    background-color: Purple;
+    transform: scale(1.05);
+}
+
 span.item-name{
     font-weight: bold;
     word-wrap: break-word;
@@ -29,7 +38,11 @@ span.item-price{
 <div class="col col-1"></div>
 {% for i in range(length) %}
     <div class="col col-2 item-container">
-        <img src="../static/img/Surgical mask.png" class="item-picture">
+        {% if products[i][6] is none %}
+        <img src="../static/img/None.png" class="item-picture">
+        {% else %}
+        <img src="../static/img/{{ products[i][6] }}" class="item-picture">
+        {% endif %}
         <br>
         <span class="item-name">{{ products[i][1] }}</span>
         <br>
@@ -46,3 +59,21 @@ span.item-price{
 </div>
 
 {% endblock %}
+
+{% block function %}
+<script>
+$(document).ready(function(){
+
+    // "pop up" item when mouse enters the box
+    $('.item-container').on('mouseenter', function(){
+        $(this).addClass('item-container-active');
+    });
+
+    // revert item when mouse leaves the box
+    $('.item-container').on('mouseleave', function(){
+        $(this).removeClass('item-container-active');
+    });
+
+})
+</script>
+{% endblock%}
