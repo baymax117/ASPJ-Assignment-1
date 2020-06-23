@@ -21,7 +21,8 @@ def db_seed(database):
                              product_type='Protective Clothing and Equipment',
                              product_price=10.00,
                              product_description='Surgical face mask to protect yourself when going out.',
-                             product_stock=100)
+                             product_stock=100,
+                             product_image="Surgical Mask.png")
 
     cloth_masks = Product(product_id=2,
                           product_name='Black Cloth Mask',
@@ -119,7 +120,7 @@ class Product(db.Model):
     product_price = Column(Float)
     product_description = Column(String)
     product_stock = Column(Integer)
-
+    product_image = Column(String)
 
 class User(db.Model):
     __tablename__ = 'users'
