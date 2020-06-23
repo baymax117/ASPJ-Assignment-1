@@ -1,19 +1,21 @@
-from MainApp import db
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Float
 
 
-def db_create():
-    db.create_all()
+db = SQLAlchemy()
+
+
+def db_create(database):
+    database.create_all()
     print('Database created.')
 
 
-def db_drop():
-    db.drop_all()
+def db_drop(database):
+    database.drop_all()
     print('Database dropped.')
 
 
-def db_seed():
+def db_seed(database):
     surgical_masks = Product(product_id=1,
                              product_name='Surgical Mask 20pcs',
                              product_type='Protective Clothing and Equipment',
@@ -77,15 +79,15 @@ def db_seed():
                                product_stock=20.00,
                                product_description='4 ply toilet paper for your toilet business.')
 
-    db.session.add(surgical_masks)
-    db.session.add(cloth_masks)
-    db.session.add(face_shield)
-    db.session.add(small_hand_sanitiser)
-    db.session.add(medium_hand_sanitiser)
-    db.session.add(large_hand_sanitiser)
-    db.session.add(toilet_paper_2py)
-    db.session.add(toilet_paper_3py)
-    db.session.add(toilet_paper_4py)
+    database.session.add(surgical_masks)
+    database.session.add(cloth_masks)
+    database.session.add(face_shield)
+    database.session.add(small_hand_sanitiser)
+    database.session.add(medium_hand_sanitiser)
+    database.session.add(large_hand_sanitiser)
+    database.session.add(toilet_paper_2py)
+    database.session.add(toilet_paper_3py)
+    database.session.add(toilet_paper_4py)
 
     john = User(user_id=1,
                 username='JohnDoe',
@@ -102,10 +104,10 @@ def db_seed():
                  email='pparker@email.com',
                  password='abcd1234')
 
-    db.session.add(john)
-    db.session.add(mary)
-    db.session.add(peter)
-    db.session.commit()
+    database.session.add(john)
+    database.session.add(mary)
+    database.session.add(peter)
+    database.session.commit()
     print('database seeded')
 
 
@@ -121,10 +123,38 @@ class Product(db.Model):
 
 class User(db.Model):
     __tablename__ = 'users'
+
     user_id = Column(Integer, primary_key=True)
-    username = Column(String)
-    email = Column(String)
-    password = Column(String)
+    username = Column(String(64))
+    email = Column(String(120), index=True, unique=True)
+    password = Column(String(128))
+
+    def is_active(self):
+        return True
+
+    def is_authenticated(self):
+        return True
+
+    def get_id(self):
+        return self.user_id
+
+    def is_anonymous(self):
+        return False
+
+
+class Payment(db.Model):
+    __tablename__ = 'cards'
+    name = Column(String(150))
+    email = Column(String(120), unique=True)
+    address = Column(String(150))
+    country = Column(String(56))
+    city = Column(String(150))
+    zip = Column(Integer)
+    cardname = Column(String(150))
+    cardnum = Column(Integer, primary_key=True)
+    expmonth = Column(String(9))
+    expyear = Column(Integer)
+    cvv = Column(Integer)
 
 # run db_create to initialize the database
 # db_create()
