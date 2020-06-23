@@ -29,6 +29,30 @@ span.item-name{
 span.item-price{
 
 }
+
+div.overlay{
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 2;
+    cursor: pointer;
+}
+
+div.overlay-item{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 50px;
+    color: white;
+    transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+}
 </style>
 {% endblock %}
 
@@ -37,7 +61,7 @@ span.item-price{
 <div class="row">
 <div class="col col-1"></div>
 {% for i in range(length) %}
-    <div class="col col-2 item-container">
+    <div class="col col-2 item-container" id="{{ products[i][1] }}">
         {% if products[i][6] is none %}
         <img src="../static/img/None.png" class="item-picture">
         {% else %}
@@ -58,6 +82,11 @@ span.item-price{
 {% endfor %}
 </div>
 
+<div class="overlay">
+    <div class="overlay-item">
+        <span id="item-name"></span>
+    </div>
+</div>
 {% endblock %}
 
 {% block function %}
@@ -74,6 +103,17 @@ $(document).ready(function(){
         $(this).removeClass('item-container-active');
     });
 
+    // show overlay when item is clicked
+    $(".item-container").on('click', function(){
+        $(".overlay").show();
+        $("#item-name").text($(this).attr('id'))
+    });
+
+    // hide overlay when overlay is clicked
+    $(".overlay").on('click', function(){
+        $(".overlay").hide();
+        $("#item-name").text('')
+    });
 })
 </script>
 {% endblock%}
