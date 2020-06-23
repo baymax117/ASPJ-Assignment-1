@@ -77,15 +77,15 @@ div#item-details > span{
 <div class="col col-1"></div>
 {% for i in range(length) %}
     <div class="col col-2 item-container" id="{{ products[i][0] }}">
-        {% if products[i][4] is none %}
+        {% if products[i][2] is none %}
         <img src="../static/img/None.png" class="item-picture">
         {% else %}
-        <img src="../static/img/{{ products[i][4] }}" class="item-picture">
+        <img src="../static/img/{{ products[i][2] }}" class="item-picture">
         {% endif %}
         <br>
         <span class="item-name">{{ products[i][0] }}</span>
         <br>
-        <span class="item-price">Price: {{ "${:.2f}".format(products[i][2]) }}</span>
+        <span class="item-price">Price: {{ "${:.2f}".format(products[i][1]) }}</span>
     </div>
 
     {% if (i+1) % 4 == 0 and i != 0 %}

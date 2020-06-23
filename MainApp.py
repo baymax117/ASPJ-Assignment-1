@@ -44,9 +44,9 @@ def home():
     statement = text('SELECT * FROM products')
     results = db.engine.execute(statement)
     products = []
-    # products -> 0: name | 1: type | 2: price | 3: desc | 4: image | 5: id
+    # products -> 0: name | 1: price | 2: image
     for row in results:
-        products.append([row[1], row[2], row[3], row[4], row[6], row[0]])
+        products.append([row[1], row[3], row[6]])
     length = len(products)
     return render_template('home.html', products=products, length=length)
 

@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float
-
+from sqlalchemy import Column, Integer, String, Float, sql
+import json
 
 db = SQLAlchemy()
 
@@ -167,3 +167,18 @@ class Payment(db.Model):
 
 # run db_drop to reset the database
 # db_drop()
+
+
+# to update the js file for the shop
+def update_js():
+    statement = sql.text('SELECT * FROM products')
+    result = db.engine.execute(statement)
+    data = []
+    for row in result:
+        data.append([row[1], row[2], row[3], row[4], row[6]])
+    data1 = json.dumps(data)
+    print(data1)
+
+    js = open("static/js/Shop.js", 'w')
+    js.write("function CreateList(){ var data = " + "{}".format(data1) + "; return data}")
+    js.close()
