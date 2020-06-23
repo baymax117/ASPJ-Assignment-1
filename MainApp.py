@@ -4,7 +4,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Integ
 from wtforms.validators import ValidationError, InputRequired, Email, EqualTo, Length, NumberRange
 from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 from uuid import uuid4
-from Database import db, User
+from Database import *
 # from signupForm import CreateUserForm
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -16,6 +16,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'sh
 # SECRET_KEY = os.environ.get('SECRET_KEY') or "asp-project-security"
 app.config['SECRET_KEY'] = "asp-project-security"
 
+db.app = app
 db.init_app(app)
 
 login_manager = LoginManager(app)
@@ -160,61 +161,18 @@ def payment():
     return render_template('payment.html', title='Payment', form=form)
 
 
-def db_create():
-    db.create_all()
-    print('Database created.')
-
-
-def db_drop():
-    db.drop_all()
-    print('Database dropped.')
-
-
-def db_seed():
-    john = User(user_id=1,
-                username='JohnDoe',
-                email='johnD@email.com',
-                password='abcd1234')
-
-    mary = User(user_id=2,
-                username='MaryJane',
-                email='maryJ@email.com',
-                password='abcd1234')
-
-    peter = User(user_id=3,
-                 username='Spidey',
-                 email='pparker@email.com',
-                 password='abcd1234')
-
-    db.session.add(john)
-    db.session.add(mary)
-    db.session.add(peter)
-    db.session.commit()
-    print('database seeded')
-
-
 # run db_create to initialize the database
-# db_create()
+# db_create(db)
 
 # run db_seed to create sample data in the database
-# db_seed()
+# db_seed(db)
 
 
 # run db_drop to reset the database
-# db_drop()
+# db_drop(db)
 
 
-# @app.cli.command('db_create')
-# def database_create():
-#     db_create()
-#
-# @app.cli.command('db_drop')
-# def database_drop():
-#     db_drop()
-#
-# @app.cli.command('db_seed')
-# def database_seed():
-#     db_seed()
+
 
 
 # database_create()
