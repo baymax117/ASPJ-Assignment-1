@@ -23,6 +23,7 @@ login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+
 def login_required(role):
     def wrapper(fn):
         @wraps(fn)
@@ -81,7 +82,7 @@ def search():
         products = []
         # products -> 0: name | 1: price | 2: image
         for row in results:
-            if query in row[1]:
+            if query.lower() in row[1].lower():
                 products.append([row[1], row[3], row[6]])
         length = len(products)
         return render_template('home_search.html', products=products, length=length, query=query)
