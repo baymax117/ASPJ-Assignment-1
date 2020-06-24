@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, Table
+from sqlalchemy import Column, Integer, String, Float, sql
+import json
 
 
 db = SQLAlchemy()
@@ -21,21 +22,24 @@ def db_seed(database):
                              product_type='Protective Clothing and Equipment',
                              product_price=10.00,
                              product_description='Surgical face mask to protect yourself when going out.',
-                             product_stock=100)
+                             product_stock=100,
+                             product_image="Surgical Mask.png")
 
     cloth_masks = Product(product_id=2,
                           product_name='Black Cloth Mask',
                           product_type='Protective Clothing and Equipment',
                           product_price=5.50,
                           product_description='Reusable cloth mask to keep you protected when going out.',
-                          product_stock=80)
+                          product_stock=80,
+                          product_image="Black Cloth Mask.png")
 
     face_shield = Product(product_id=3,
                           product_name='Plastic Face Shield',
                           product_type='Protective Clothing and Equipment',
                           product_price=5.90,
                           product_description='Reusable face shield to keep you protected when going out.',
-                          product_stock=85)
+                          product_stock=85,
+                          product_image="Plastic Face Shield.png")
 
     small_hand_sanitiser = Product(product_id=4,
                                    product_name='Hand Sanitiser 50ml',
@@ -129,7 +133,7 @@ class Product(db.Model):
     product_price = Column(Float)
     product_description = Column(String)
     product_stock = Column(Integer)
-
+    product_image = Column(String)
 
 class User(db.Model):
     id = Column(Integer, primary_key=True)
@@ -192,3 +196,18 @@ class Payment(db.Model):
 
 # run db_drop to reset the database
 # db_drop()
+
+
+# to update the js file for the shop
+def update_js():
+    statement = sql.text('SELECT * FROM products')
+    result = db.engine.execute(statement)
+    data = []
+    for row in result:
+        data.append([row[1], row[2], row[3], row[4], row[6]])
+    data1 = json.dumps(data)
+    print(data1)
+
+    js = open("static/js/Shop.js", 'w')
+    js.write("function CreateList(){ var data = " + "{}".format(data1) + "; return data}")
+    js.close()

@@ -2,11 +2,9 @@ from flask import Flask, render_template, redirect, flash, url_for, request, g, 
 from Forms import UserLoginForm, CreateUserForm, PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 from functools import wraps
-
-
+from sqlalchemy.sql import text
 from uuid import uuid4
 from Database import *
-# from signupForm import CreateUserForm
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
@@ -47,6 +45,7 @@ def login_required(role):
 def load_user(id):
     return User.query.get(int(id))
 
+
 # Add  @login_required and state the specific role 'admin' to protect against anonymous users to view a function,
 # Put below @app.route, will prevent them from accessing this function
 
@@ -60,16 +59,23 @@ def home():
     #     if request.form['password'] == 'password':
     #         session['user'] = request.form['username']
     #         return redirect(url_for('protected_testing'))
-    return render_template('home.html')
+    statement = text('SELECT * FROM products')
+    results = db.engine.execute(statement)
+    products = []
+    # products -> 0: name | 1: price | 2: image
+    for row in results:
+        products.append([row[1], row[3], row[6]])
+    length = len(products)
+    return render_template('home.html', products=products, length=length)
 
 
 @app.route('/protected_testing')
 def protected():
-    print("Hello 1")
+    print("Inside Protected")
     if g.user:
-        print("Hello good")
+        print("Login good")
         return render_template('protected_testing.html', user=session['user'])
-    print("Hello 111111111111")
+    print("Login Bad")
     return redirect(url_for('home'))
 
 
@@ -183,4 +189,4 @@ def admin_test():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
