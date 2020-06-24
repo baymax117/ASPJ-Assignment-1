@@ -56,6 +56,11 @@ div.overlay-item{
     -ms-transform: translate(-50%,-50%);
 }
 
+img.item-image-mini{
+    height: 150px;
+    width: 150px;
+}
+
 img#item-image{
     display:inline-block;
     vertical-align: middle;
@@ -78,9 +83,9 @@ div#item-details > span{
 {% for i in range(length) %}
     <div class="col col-2 item-container" id="{{ products[i][0] }}">
         {% if products[i][2] is none %}
-        <img src="../static/img/None.png" class="item-picture">
+        <img src="../static/img/None.png" class="item-image-mini">
         {% else %}
-        <img src="../static/img/{{ products[i][2] }}" class="item-picture">
+        <img src="../static/img/{{ products[i][2] }}" class="item-image-mini">
         {% endif %}
         <br>
         <span class="item-name">{{ products[i][0] }}</span>
