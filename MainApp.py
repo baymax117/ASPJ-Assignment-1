@@ -69,6 +69,8 @@ def home():
     return render_template('home.html', products=products, length=length)
 
 
+
+
 @app.route('/protected_testing')
 def protected():
     print("Inside Protected")
@@ -159,7 +161,6 @@ def signup():
 def payment():
     form = PaymentForm()
     return render_template('payment.html', title='Payment', form=form)
-
 
 
 @app.route('/admin_test', methods=['GET', 'POST'])
