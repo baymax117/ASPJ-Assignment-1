@@ -45,21 +45,24 @@ def db_seed(database):
                                    product_type='Hand Wash and Sanitisers',
                                    product_price=3.50,
                                    product_description='Small bottle of hand sanitiser to keep your hands clean while outside.',
-                                   product_stock=100)
+                                   product_stock=100,
+                                   product_image='Hand Sanitiser 50ml.png')
 
     medium_hand_sanitiser = Product(product_id=5,
                                     product_name='Hand Sanitiser 150ml',
                                     product_type='Hand Wash and Sanitisers',
                                     product_price=9.50,
                                     product_description='Medium bottle of hand sanitiser to keep your hands clean while outside for a little longer.',
-                                    product_stock=90)
+                                    product_stock=90,
+                                    product_image='Hand Sanitiser 150ml.png')
 
     large_hand_sanitiser = Product(product_id=6,
                                    product_name='Hand Sanitiser 500ml',
                                    product_type='Hand Wash and Sanitisers',
                                    product_price=30.00,
                                    product_description='Large bottle of hand sanitiser to keep your hands clean while at home.',
-                                   product_stock=70)
+                                   product_stock=70,
+                                   product_image='Hand Sanitiser 500ml.png')
 
     toilet_paper_2py = Product(product_id=7,
                                product_name='Toilet Paper 2ply 10pcs',
@@ -159,15 +162,6 @@ class Payment(db.Model):
     expyear = Column(Integer)
     cvv = Column(Integer)
 
-# run db_create to initialize the database
-# db_create()
-
-# run db_seed to create sample data in the database
-# db_seed()
-
-# run db_drop to reset the database
-# db_drop()
-
 
 # to update the js file for the shop
 def update_js():
@@ -182,3 +176,5 @@ def update_js():
     js = open("static/js/Shop.js", 'w')
     js.write("function CreateList(){ var data = " + "{}".format(data1) + "; return data}")
     js.close()
+
+

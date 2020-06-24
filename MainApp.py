@@ -64,7 +64,6 @@ def protected():
 @app.before_request
 def before_request():
     g.user = None
-
     if 'user' in session:
         g.user = session['user']
 
@@ -139,10 +138,11 @@ def payment():
 # run db_seed to create sample data in the database
 # db_seed(db)
 
-
 # run db_drop to reset the database
 # db_drop(db)
 
+# update the js file
+# update_js()
 
 
 
