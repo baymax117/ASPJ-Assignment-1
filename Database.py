@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, Table
 
 
 db = SQLAlchemy()
@@ -89,24 +89,34 @@ def db_seed(database):
     database.session.add(toilet_paper_3py)
     database.session.add(toilet_paper_4py)
 
-    john = User(user_id=1,
+    john = User(
                 username='JohnDoe',
                 email='johnD@email.com',
-                password='abcd1234')
+                password='abcd1234',
+                urole='Admin',
+                is_authenticated=False,
+                is_active=False)
 
-    mary = User(user_id=2,
+    mary = User(
                 username='MaryJane',
                 email='maryJ@email.com',
-                password='abcd1234')
+                password='abcd1234',
+                urole='customer',
+                is_authenticated=False,
+                is_active=False)
 
-    peter = User(user_id=3,
+    peter = User(
                  username='Spidey',
                  email='pparker@email.com',
-                 password='abcd1234')
+                 password='abcd1234',
+                 urole='customer',
+                 is_authenticated=False,
+                 is_active=False)
 
-    database.session.add(john)
-    database.session.add(mary)
-    database.session.add(peter)
+    # database.session.add(john_assign)
+    # database.session.add(mary_assign)
+    # database.session.add(peter_assign)
+
     database.session.commit()
     print('database seeded')
 
@@ -122,24 +132,42 @@ class Product(db.Model):
 
 
 class User(db.Model):
-    __tablename__ = 'users'
-
-    user_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     username = Column(String(64))
     email = Column(String(120), index=True, unique=True)
     password = Column(String(128))
+    is_authenticated = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=False)
+    urole=Column(String(80))
 
-    def is_active(self):
-        return True
 
-    def is_authenticated(self):
-        return True
+    def __init__(self, username, password, email,is_active, is_authenticated ,urole):
+        self.username = username
+        self.password = password
+        self.email = email
+        self.is_active = is_active
+        self.is_authenticated = is_authenticated
+        self.urole = urole
+
+    def is_authenticate(self):
+        return self.is_authenticated
+
+    def activate_is_authenticated(self):
+        self.is_authenticated = True
+
+    def deactivate_is_authenticated(self):
+        self.is_authenticated = False
 
     def get_id(self):
-        return self.user_id
-
-    def is_anonymous(self):
-        return False
+        return self.id
+    def is_acive(self):
+        return self.is_active
+    def activate_user(self):
+        self.is_active = True
+    def get_username(self):
+        return self.username
+    def get_urole(self):
+        return self.urole
 
 
 class Payment(db.Model):

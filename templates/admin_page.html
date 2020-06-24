@@ -2,5 +2,6 @@
 {% block title %}Home Page{% endblock %}
 {% from "includes/_formHelper.html" import render_field %}
 {% block content %}
-<h1>Welcome {{user }} to our shop</h1>
+<h1>Admin Only</h1>
 {% endblock %}
+<button onclick="window.location = 'http://Localhost:5000/dropsession'" type="submit">Sign out</button>
