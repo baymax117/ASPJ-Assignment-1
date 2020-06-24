@@ -140,7 +140,7 @@ def signup():
         exists = db.session.query(User.id).filter_by(email=form.email.data).scalar()
         if exists is None:
             hashed_password = generate_password_hash(form.password.data, method='sha256')
-            newuser = User(username=form.username.data, email=form.email.data, password=hashed_password, urole='customer', is_active=True, is_authenticated=False)
+            newuser = User(username=form.username.data, email=form.email.data, password=hashed_password, urole='admin', is_active=True, is_authenticated=False)
             # Role.create('customer')
 
             # newuser.roles.append(Role(name='customer', id=2))
@@ -159,7 +159,6 @@ def signup():
 def payment():
     form = PaymentForm()
     return render_template('payment.html', title='Payment', form=form)
-
 
 
 

@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, sql
+from sqlalchemy import Column, Integer, String, Float, sql, Boolean
 import json
 
 
@@ -70,21 +70,24 @@ def db_seed(database):
                                product_type='Paper and Tissue',
                                product_price=6.50,
                                product_description='2 ply toilet paper for your toilet business.',
-                               product_stock=20)
+                               product_stock=20,
+                               product_image='Toilet Paper 2ply 10pcs.png')
 
     toilet_paper_3py = Product(product_id=8,
                                product_name='Toilet Paper 3ply 10pcs',
                                product_type='Paper and Tissue',
                                product_price=8.50,
+                               product_description='3 ply toilet paper for your toilet business.',
                                product_stock=20.00,
-                               product_description='3 ply toilet paper for your toilet business.')
+                               product_image='Toilet Paper 3ply 10pcs.png')
 
     toilet_paper_4py = Product(product_id=9,
                                product_name='Toilet Paper 4ply 10pcs',
                                product_type='Paper and Tissue',
                                product_price=10.50,
+                               product_description='4 ply toilet paper for your toilet business.',
                                product_stock=20.00,
-                               product_description='4 ply toilet paper for your toilet business.')
+                               product_image='Toilet Paper 4ply 10pcs.png')
 
     database.session.add(surgical_masks)
     database.session.add(cloth_masks)
@@ -138,7 +141,9 @@ class Product(db.Model):
     product_stock = Column(Integer)
     product_image = Column(String)
 
+
 class User(db.Model):
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     username = Column(String(64))
     email = Column(String(120), index=True, unique=True)
@@ -146,7 +151,6 @@ class User(db.Model):
     is_authenticated = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
     urole=Column(String(80))
-
 
     def __init__(self, username, password, email,is_active, is_authenticated ,urole):
         self.username = username
