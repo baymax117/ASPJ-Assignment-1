@@ -69,6 +69,22 @@ def home():
     return render_template('home.html', products=products, length=length)
 
 
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.args.get('q') == '':
+        print('redirected')
+        return redirect(url_for('home'))
+    else:
+        query = request.args.get('q')
+        statement = text('SELECT * FROM products')
+        results = db.engine.execute(statement)
+        products = []
+        # products -> 0: name | 1: price | 2: image
+        for row in results:
+            if query in row[1]:
+                products.append([row[1], row[3], row[6]])
+        length = len(products)
+        return render_template('home_search.html', products=products, length=length, query=query)
 
 
 @app.route('/protected_testing')

@@ -1,10 +1,10 @@
-<nav class="navbar navbar-light navbar-expand-md bg-faded justify-content-center">
+<nav class="navbar navbar-dark navbar-expand-md bg-dark justify-content-center">
     <a href="/" class="navbar-brand d-flex w-50 mr-auto">CB Shop</a>
     <div class="navbar-collapse collapse w-100">
-      {% if url_for(request.endpoint) == '/home' %}
+      {% if url_for(request.endpoint) == '/' or '/home' or '/search' %}
       <ul class="navbar-nav w-100 justify-content-center">
           <li class="nav-item active">
-              <form class="form-inline my-2 my-lg-0">
+              <form class="form-inline my-2 my-lg-0" action="/search">
                 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="q">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
               </form>
