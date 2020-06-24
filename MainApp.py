@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, flash, url_for, request, g, session
 from Forms import UserLoginForm, CreateUserForm, PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
+from functools import wraps
 from sqlalchemy.sql import text
 from uuid import uuid4
 from Database import *
@@ -22,13 +23,30 @@ login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+def login_required(role):
+    def wrapper(fn):
+        @wraps(fn)
+        def decorated_view(*args, **kwargs):
+            if current_user.is_authenticated == False:
+              print("YO MAN")
+              # return login_manager.unauthorized()
+              return "Forbidden access", 402
+            print("Next option")
+            if (current_user.urole != role):
+                print("YO MAN 2")
+                # return login_manager.unauthorized()
+                return "Forbidden access", 402
+            return fn(*args, **kwargs)
+        return decorated_view
+    return wrapper
+
 
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
 
 
-# Add  @login_required to protect against anonymous users to view a function,
+# Add  @login_required and state the specific role 'admin' to protect against anonymous users to view a function,
 # Put below @app.route, will prevent them from accessing this function
 
 
@@ -91,6 +109,9 @@ def login():
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember_me.data)
+                user.activate_is_authenticated()
+                print(user.is_authenticated)
+                print("hey",current_user.is_authenticated)
                 db.session.add(user)
                 db.session.commit()
                 session['user'] = request.form['username']
@@ -116,13 +137,21 @@ def signup():
 
     form = CreateUserForm()
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data, method='sha256')
-        newuser = User(username=form.username.data, email=form.email.data, password=hashed_password)
-        # newuser.set_password(form.password.data)
-        db.session.add(newuser)
-        db.session.commit()
-        flash("You have successfully signed up!")
-        return redirect(url_for('login'))
+        exists = db.session.query(User.id).filter_by(email=form.email.data).scalar()
+        if exists is None:
+            hashed_password = generate_password_hash(form.password.data, method='sha256')
+            newuser = User(username=form.username.data, email=form.email.data, password=hashed_password, urole='customer', is_active=True, is_authenticated=False)
+            # Role.create('customer')
+
+            # newuser.roles.append(Role(name='customer', id=2))
+            # newuser.set_password(form.password.data)
+            db.session.add(newuser)
+            db.session.commit()
+            flash("You have successfully signed up!")
+            return redirect(url_for('login'))
+
+        flash("Email exists!!")
+        return redirect(url_for('signup'))
     return render_template('sign up.html', title="Sign Up", form=form)
 
 
@@ -130,6 +159,14 @@ def signup():
 def payment():
     form = PaymentForm()
     return render_template('payment.html', title='Payment', form=form)
+
+
+
+
+@app.route('/admin_test', methods=['GET', 'POST'])
+@login_required('admin')
+def admin_test():
+    return render_template('admin_page.html'), 200
 
 
 # run db_create to initialize the database
