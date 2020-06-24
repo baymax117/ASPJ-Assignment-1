@@ -2,16 +2,16 @@ from flask_wtf import FlaskForm
 #from wtforms import Form, StringField, validators, RadioField, TextAreaField, SelectField
 #from flask_sqlalchemy import SQLAlchemy
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, length
 #from Database import User
 
 
 
 class CreateUserForm(FlaskForm):
-    userName = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    userName = StringField('Username', validators=[DataRequired(), length(min=1, max=150)])
+    email = StringField('Email', validators=[DataRequired(), Email(), length(min=1, max=150)])
+    password = PasswordField('Password', validators=[DataRequired(), length(min=8, max=150)])
+    confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Password does not match")])
     submit = SubmitField('Sign up!')
 
     def validate_username(self, userName):

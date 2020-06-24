@@ -98,8 +98,8 @@ def dropsession():
 def login():
     # if current_user.is_authenticated:
     #     return redirect(url_for('home'))
-    if request.method == 'POST':
-        session.pop('user', None)
+    # if request.method == 'POST':
+    #     session.pop('user', None)
 
     form = UserLoginForm()
 
@@ -119,7 +119,7 @@ def login():
 
                 return redirect(url_for('protected'))
         flash("Invalid username or password, please try again!")
-        return redirect(url_for('protected'))
+        return redirect(url_for('login'))
 
     return render_template('login.html', form=form, title="Login in")
 
@@ -138,7 +138,8 @@ def signup():
     form = CreateUserForm()
     if form.validate_on_submit():
         exists = db.session.query(User.id).filter_by(email=form.email.data).scalar()
-        if exists is None:
+        exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
+        if exists is None and exists2 is None:
             hashed_password = generate_password_hash(form.password.data, method='sha256')
             newuser = User(username=form.username.data, email=form.email.data, password=hashed_password, urole='admin', is_active=True, is_authenticated=False)
             # Role.create('customer')
