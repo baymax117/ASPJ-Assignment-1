@@ -7,9 +7,10 @@ from uuid import uuid4
 from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
-
+from api.Cart import cart_api
 
 app = Flask(__name__)
+app.register_blueprint(cart_api, url_prefix='/api/Cart')
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
@@ -54,12 +55,10 @@ def load_user(id):
 @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    # if request.method == 'POST':
-    #     session.pop('user', None)
-    #
-    #     if request.form['password'] == 'password':
-    #         session['user'] = request.form['username']
-    #         return redirect(url_for('protected_testing'))
+    if current_user is None:
+        user = None
+    else:
+        user = current_user
     statement = text('SELECT * FROM products')
     results = db.engine.execute(statement)
     products = []
@@ -68,11 +67,15 @@ def home():
         print(row)
         products.append([row[1], row[3], row[6]])
     length = len(products)
-    return render_template('home.html', products=products, length=length)
+    return render_template('home.html', products=products, length=length, user=user)
 
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    if current_user is None:
+        user = None
+    else:
+        user = current_user
     if request.args.get('q') == '':
         print('redirected')
         return redirect(url_for('home'))
@@ -86,17 +89,17 @@ def search():
             if query.lower() in row[1].lower():
                 products.append([row[1], row[3], row[6]])
         length = len(products)
-        return render_template('home_search.html', products=products, length=length, query=query)
+        return render_template('home_search.html', products=products, length=length, query=query, user=user)
 
 
-@app.route('/protected_testing')
-def protected():
-    print("Inside Protected")
-    if g.user:
-        print("Login good")
-        return render_template('protected_testing.html', user=session['user'])
-    print("Login Bad")
-    return redirect(url_for('home'))
+# @app.route('/protected_testing')
+# def protected():
+#     print("Inside Protected")
+#     if g.user:
+#         print("Login good")
+#         return render_template('protected_testing.html', user=session['user'])
+#     print("Login Bad")
+#     return redirect(url_for('home'))
 
 
 @app.before_request
@@ -137,7 +140,7 @@ def login():
                 session['user'] = request.form['username']
                 print("Login sucessful")
 
-                return redirect(url_for('protected'))
+                return redirect(url_for('home'))
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
 
@@ -176,14 +179,23 @@ def signup():
     return render_template('sign up.html', title="Sign Up", form=form)
 
 
+@app.route('/cart')
+def cart():
+    return render_template('cart.html')
+
+
 @app.route('/payment', methods=['GET', 'POST'])
 def payment():
+    if current_user is None:
+        user = None
+    else:
+        user = current_user
     form = PaymentForm()
     if request.method == 'POST':
         if form.validate_on_submit():
             print('Payment successful')
             return redirect(url_for('home'))
-    return render_template('payment.html', title='Payment', form=form)
+    return render_template('payment.html', title='Payment', form=form, user=user)
 
 
 @app.route('/admin_test', methods=['GET', 'POST'])
@@ -192,22 +204,21 @@ def admin_test():
     return render_template('admin_page.html'), 200
 
 
-# run db_create to initialize the database
-# db_create(db)
+def reset_database():
+    # run db_drop to reset the database
+    db_drop(db)
 
-# run db_seed to create sample data in the database
-# db_seed(db)
+    # run db_create to initialize the database
+    db_create(db)
 
-# run db_drop to reset the database
-# db_drop(db)
+    # run db_seed to create sample data in the database
+    db_seed(db)
 
-# update the js file
-# update_js()
+    # update the js file
+    update_js()
 
-
-
-
-# database_create()
+# Uncomment this function to reset the database
+# reset_database()
 
 
 if __name__ == "__main__":
