@@ -8,9 +8,11 @@ from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from api.Cart import cart_api
+from api.Reviews import review_api
 
 app = Flask(__name__)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
+app.register_blueprint(review_api, url_prefix='/api/Reviews')
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
