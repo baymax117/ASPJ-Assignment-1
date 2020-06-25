@@ -202,7 +202,7 @@ def update_js():
     result = db.engine.execute(statement)
     data = []
     for row in result:
-        data.append([row[1], row[2], row[3], row[4], row[6]])
+        data.append([row[0], row[1], row[2], row[3], row[4], row[6]])
     data1 = json.dumps(data)
     print(data1)
     js = open("static/js/Shop.js", 'w')
