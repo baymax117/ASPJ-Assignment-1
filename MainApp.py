@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, flash, url_for, request, g, session
+from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify
 from Forms import UserLoginForm, CreateUserForm, PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 from functools import wraps
@@ -7,6 +7,7 @@ from uuid import uuid4
 from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+#from datetime import timedelta
 
 
 app = Flask(__name__)
@@ -22,6 +23,13 @@ db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# login_manager.refresh_view = 'relogin'
+# login_manager.needs_refresh_message = (u"Session timedout, please re-login")
+# login_manager.needs_refresh_message_category = 'info'
+
+user_schema = UserSchema()  #expect 1 record back
+users_schema = UserSchema(many=True) #expect multiple record back
 
 def login_required(role):
     def wrapper(fn):
@@ -53,12 +61,10 @@ def load_user(id):
 @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    # if request.method == 'POST':
-    #     session.pop('user', None)
-    #
-    #     if request.form['password'] == 'password':
-    #         session['user'] = request.form['username']
-    #         return redirect(url_for('protected_testing'))
+    if current_user is None:
+        user = None
+    else:
+        user = current_user
     statement = text('SELECT * FROM products')
     results = db.engine.execute(statement)
     products = []
@@ -66,17 +72,49 @@ def home():
     for row in results:
         products.append([row[1], row[3], row[6]])
     length = len(products)
-    return render_template('home.html', products=products, length=length)
+    return render_template('home.html', products=products, length=length, user=user)
 
 
-@app.route('/protected_testing')
-def protected():
-    print("Inside Protected")
-    if g.user:
-        print("Login good")
-        return render_template('protected_testing.html', user=session['user'])
-    print("Login Bad")
-    return redirect(url_for('home'))
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if current_user is None:
+        user = None
+    else:
+        user = current_user
+    if request.args.get('q') == '':
+        print('redirected')
+        return redirect(url_for('home'))
+    else:
+        query = request.args.get('q')
+        statement = text('SELECT * FROM products')
+        results = db.engine.execute(statement)
+        products = []
+        # products -> 0: name | 1: price | 2: image
+        for row in results:
+            if query.lower() in row[1].lower():
+                products.append([row[1], row[3], row[6]])
+        length = len(products)
+        return render_template('home_search.html', products=products, length=length, query=query, user=user)
+
+
+
+
+@app.route('/getallusersrecords', methods=['GET'])
+def getallusersrecords():
+    users_list = User.query.all()
+    result = users_schema.dump(users_list)
+    return jsonify(result)
+
+
+# @app.route('/protected_testing/<username>')
+# def protected(username):
+#     print("Inside Protected")
+#     if g.user:
+#         print("Login good")
+#         return render_template('protected_testing.html', user=session['user'])
+#     print("Login Bad")
+#     return redirect(url_for('home'))
 
 
 @app.before_request
@@ -85,6 +123,8 @@ def before_request():
 
     if 'user' in session:
         g.user = session['user']
+        # session.permant = True
+        # app.permanent_session_lifetime = timedelta(minutes=1)
 
 
 @app.route('/dropsession')
@@ -118,7 +158,7 @@ def login():
                 session['user'] = request.form['username']
                 print("Login sucessful")
 
-                return redirect(url_for('protected'))
+                return redirect(url_for('home', username=current_user.username))
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
 
@@ -127,6 +167,13 @@ def login():
 
 @app.route('/logout')
 def logout():
+    print("id", current_user.id)
+    # print("name",current_user.username)
+    # print("not log out yet", current_user.is_authenticate())
+    current_user.deactivate_is_authenticated()
+    db.session.add(current_user)
+    db.session.commit()
+    # print("log out le",current_user.is_authenticate())
     logout_user()
     return redirect(url_for("home"))
 
@@ -157,10 +204,20 @@ def signup():
     return render_template('sign up.html', title="Sign Up", form=form)
 
 
+@app.route('/cart')
+def cart():
+    return render_template('cart.html')
+
+
+
 @app.route('/payment', methods=['GET', 'POST'])
 def payment():
+    if current_user is None:
+        user = None
+    else:
+        user = current_user
     form = PaymentForm()
-    return render_template('payment.html', title='Payment', form=form)
+    return render_template('payment.html', title='Payment', form=form, user=user)
 
 
 
@@ -171,21 +228,23 @@ def admin_test():
     return render_template('admin_page.html'), 200
 
 
-# run db_create to initialize the database
-# db_create(db)
 
-# run db_seed to create sample data in the database
-# db_seed(db)
+def reset_database():
+    # run db_drop to reset the database
+    db_drop(db)
+
+    # run db_create to initialize the database
+    db_create(db)
+
+    # run db_seed to create sample data in the database
+    db_seed(db)
+
+    # update the js file
+    update_js()
 
 
-# run db_drop to reset the database
-# db_drop(db)
-
-
-
-
-
-# database_create()
+# Uncomment this function to reset the database
+# reset_database()
 
 
 if __name__ == "__main__":

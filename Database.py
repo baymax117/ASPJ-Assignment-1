@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, sql
+from sqlalchemy import Column, Integer, String, Float, sql, Boolean
 import json
-
+from flask_marshmallow import Marshmallow
 
 db = SQLAlchemy()
+ma = Marshmallow()
 
 
 def db_create(database):
@@ -173,6 +174,12 @@ class User(db.Model):
     def get_urole(self):
         return self.urole
 
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'username', 'email', 'password','is_authenticated', 'is_active', 'urole')
+
+
+
 
 class Payment(db.Model):
     __tablename__ = 'cards'
@@ -188,14 +195,7 @@ class Payment(db.Model):
     expyear = Column(Integer)
     cvv = Column(Integer)
 
-# run db_create to initialize the database
-# db_create()
 
-# run db_seed to create sample data in the database
-# db_seed()
-
-# run db_drop to reset the database
-# db_drop()
 
 
 # to update the js file for the shop
