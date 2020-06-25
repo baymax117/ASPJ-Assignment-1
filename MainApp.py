@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, flash, url_for, request, g, session
+from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify
 from Forms import UserLoginForm, CreateUserForm, PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 from functools import wraps
@@ -7,12 +7,14 @@ from uuid import uuid4
 from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+#from datetime import timedelta
 from api.Cart import cart_api
 from api.Reviews import review_api
 
 app = Flask(__name__)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
@@ -26,6 +28,12 @@ login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# login_manager.refresh_view = 'relogin'
+# login_manager.needs_refresh_message = (u"Session timedout, please re-login")
+# login_manager.needs_refresh_message_category = 'info'
+
+user_schema = UserSchema()  #expect 1 record back
+users_schema = UserSchema(many=True) #expect multiple record back
 
 def login_required(role):
     def wrapper(fn):
@@ -72,6 +80,7 @@ def home():
     return render_template('home.html', products=products, length=length, user=user)
 
 
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if current_user is None:
@@ -94,8 +103,17 @@ def search():
         return render_template('home_search.html', products=products, length=length, query=query, user=user)
 
 
-# @app.route('/protected_testing')
-# def protected():
+
+
+@app.route('/getallusersrecords', methods=['GET'])
+def getallusersrecords():
+    users_list = User.query.all()
+    result = users_schema.dump(users_list)
+    return jsonify(result)
+
+
+# @app.route('/protected_testing/<username>')
+# def protected(username):
 #     print("Inside Protected")
 #     if g.user:
 #         print("Login good")
@@ -107,8 +125,11 @@ def search():
 @app.before_request
 def before_request():
     g.user = None
+
     if 'user' in session:
         g.user = session['user']
+        # session.permant = True
+        # app.permanent_session_lifetime = timedelta(minutes=1)
 
 
 @app.route('/dropsession')
@@ -142,7 +163,7 @@ def login():
                 session['user'] = request.form['username']
                 print("Login sucessful")
 
-                return redirect(url_for('home'))
+                return redirect(url_for('home', username=current_user.username))
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
 
@@ -151,6 +172,13 @@ def login():
 
 @app.route('/logout')
 def logout():
+    print("id", current_user.id)
+    # print("name",current_user.username)
+    # print("not log out yet", current_user.is_authenticate())
+    current_user.deactivate_is_authenticated()
+    db.session.add(current_user)
+    db.session.commit()
+    # print("log out le",current_user.is_authenticate())
     logout_user()
     return redirect(url_for("home"))
 
@@ -166,7 +194,7 @@ def signup():
         exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
         if exists is None and exists2 is None:
             hashed_password = generate_password_hash(form.password.data, method='sha256')
-            newuser = User(username=form.username.data, email=form.email.data, password=hashed_password, urole='admin', is_active=True, is_authenticated=False)
+            newuser = User(username=form.username.data, email=form.email.data, password=hashed_password, urole='customer', is_active=True, is_authenticated=False)
             # Role.create('customer')
 
             # newuser.roles.append(Role(name='customer', id=2))
@@ -186,6 +214,7 @@ def cart():
     return render_template('cart.html')
 
 
+
 @app.route('/payment', methods=['GET', 'POST'])
 def payment():
     if current_user is None:
@@ -200,10 +229,13 @@ def payment():
     return render_template('payment.html', title='Payment', form=form, user=user)
 
 
+
+
 @app.route('/admin_test', methods=['GET', 'POST'])
 @login_required('admin')
 def admin_test():
     return render_template('admin_page.html'), 200
+
 
 
 def reset_database():
@@ -218,6 +250,7 @@ def reset_database():
 
     # update the js file
     update_js()
+
 
 # Uncomment this function to reset the database
 # reset_database()
