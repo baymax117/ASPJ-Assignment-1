@@ -46,6 +46,7 @@ def home():
     products = []
     # products -> 0: name | 1: price | 2: image
     for row in results:
+        print(row)
         products.append([row[1], row[3], row[6]])
     length = len(products)
     return render_template('home.html', products=products, length=length)
