@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, sql
+from sqlalchemy import Column, Integer, String, Float, sql, Boolean
 import json
+
 
 db = SQLAlchemy()
 
@@ -45,42 +46,48 @@ def db_seed(database):
                                    product_type='Hand Wash and Sanitisers',
                                    product_price=3.50,
                                    product_description='Small bottle of hand sanitiser to keep your hands clean while outside.',
-                                   product_stock=100)
+                                   product_stock=100,
+                                   product_image='Hand Sanitiser 50ml.png')
 
     medium_hand_sanitiser = Product(product_id=5,
                                     product_name='Hand Sanitiser 150ml',
                                     product_type='Hand Wash and Sanitisers',
                                     product_price=9.50,
                                     product_description='Medium bottle of hand sanitiser to keep your hands clean while outside for a little longer.',
-                                    product_stock=90)
+                                    product_stock=90,
+                                    product_image='Hand Sanitiser 150ml.png')
 
     large_hand_sanitiser = Product(product_id=6,
                                    product_name='Hand Sanitiser 500ml',
                                    product_type='Hand Wash and Sanitisers',
                                    product_price=30.00,
                                    product_description='Large bottle of hand sanitiser to keep your hands clean while at home.',
-                                   product_stock=70)
+                                   product_stock=70,
+                                   product_image='Hand Sanitiser 500ml.png')
 
     toilet_paper_2py = Product(product_id=7,
                                product_name='Toilet Paper 2ply 10pcs',
                                product_type='Paper and Tissue',
                                product_price=6.50,
                                product_description='2 ply toilet paper for your toilet business.',
-                               product_stock=20)
+                               product_stock=20,
+                               product_image='Toilet Paper 2ply 10pcs.png')
 
     toilet_paper_3py = Product(product_id=8,
                                product_name='Toilet Paper 3ply 10pcs',
                                product_type='Paper and Tissue',
                                product_price=8.50,
+                               product_description='3 ply toilet paper for your toilet business.',
                                product_stock=20.00,
-                               product_description='3 ply toilet paper for your toilet business.')
+                               product_image='Toilet Paper 3ply 10pcs.png')
 
     toilet_paper_4py = Product(product_id=9,
                                product_name='Toilet Paper 4ply 10pcs',
                                product_type='Paper and Tissue',
                                product_price=10.50,
+                               product_description='4 ply toilet paper for your toilet business.',
                                product_stock=20.00,
-                               product_description='4 ply toilet paper for your toilet business.')
+                               product_image='Toilet Paper 4ply 10pcs.png')
 
     database.session.add(surgical_masks)
     database.session.add(cloth_masks)
@@ -92,24 +99,34 @@ def db_seed(database):
     database.session.add(toilet_paper_3py)
     database.session.add(toilet_paper_4py)
 
-    john = User(user_id=1,
+    john = User(
                 username='JohnDoe',
                 email='johnD@email.com',
-                password='abcd1234')
+                password='abcd1234',
+                urole='Admin',
+                is_authenticated=False,
+                is_active=False)
 
-    mary = User(user_id=2,
+    mary = User(
                 username='MaryJane',
                 email='maryJ@email.com',
-                password='abcd1234')
+                password='abcd1234',
+                urole='customer',
+                is_authenticated=False,
+                is_active=False)
 
-    peter = User(user_id=3,
+    peter = User(
                  username='Spidey',
                  email='pparker@email.com',
-                 password='abcd1234')
+                 password='abcd1234',
+                 urole='customer',
+                 is_authenticated=False,
+                 is_active=False)
 
-    database.session.add(john)
-    database.session.add(mary)
-    database.session.add(peter)
+    # database.session.add(john_assign)
+    # database.session.add(mary_assign)
+    # database.session.add(peter_assign)
+
     database.session.commit()
     print('database seeded')
 
@@ -124,25 +141,44 @@ class Product(db.Model):
     product_stock = Column(Integer)
     product_image = Column(String)
 
+
 class User(db.Model):
     __tablename__ = 'users'
-
-    user_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     username = Column(String(64))
     email = Column(String(120), index=True, unique=True)
     password = Column(String(128))
+    is_authenticated = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=False)
+    urole=Column(String(80))
 
-    def is_active(self):
-        return True
+    def __init__(self, username, password, email,is_active, is_authenticated ,urole):
+        self.username = username
+        self.password = password
+        self.email = email
+        self.is_active = is_active
+        self.is_authenticated = is_authenticated
+        self.urole = urole
 
-    def is_authenticated(self):
-        return True
+    def is_authenticate(self):
+        return self.is_authenticated
+
+    def activate_is_authenticated(self):
+        self.is_authenticated = True
+
+    def deactivate_is_authenticated(self):
+        self.is_authenticated = False
 
     def get_id(self):
-        return self.user_id
-
-    def is_anonymous(self):
-        return False
+        return self.id
+    def is_acive(self):
+        return self.is_active
+    def activate_user(self):
+        self.is_active = True
+    def get_username(self):
+        return self.username
+    def get_urole(self):
+        return self.urole
 
 
 class Payment(db.Model):
@@ -159,15 +195,6 @@ class Payment(db.Model):
     expyear = Column(Integer)
     cvv = Column(Integer)
 
-# run db_create to initialize the database
-# db_create()
-
-# run db_seed to create sample data in the database
-# db_seed()
-
-# run db_drop to reset the database
-# db_drop()
-
 
 # to update the js file for the shop
 def update_js():
@@ -182,3 +209,5 @@ def update_js():
     js = open("static/js/Shop.js", 'w')
     js.write("function CreateList(){ var data = " + "{}".format(data1) + "; return data}")
     js.close()
+
+
