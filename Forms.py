@@ -22,18 +22,19 @@ class CreateUserForm(FlaskForm):
 
 class PaymentForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired(), Length(min=1, max=150)])
-    email = StringField('Email', validators=[InputRequired(), Length(min=1, max=150)])
-    address = StringField('Address', validators=[InputRequired(), Length(min=1, max=150)])
+    email = StringField('Email', validators=[InputRequired(), Length(min=9, max=150), Email(message='Please enter valid email')])
+    address = StringField('Address', validators=[InputRequired(), Length(min= 1,max=150)])
     country = StringField('Country', validators=[InputRequired(), Length(min=1, max=150)])
     city = StringField('City', validators=[InputRequired(), Length(min=1, max=150)])
     zip = IntegerField('Zip', validators=[InputRequired(), NumberRange(min=100000, max=999999)])
     cardName = StringField('Name on card', validators=[InputRequired(), Length(min=1, max=150)])
-    cardNum = IntegerField('Credit card number', validators=[InputRequired()])
-    expmonth = SelectField('Exp month', validators=[InputRequired()],
-                           choices=[('January', 'January'), ('February', 'February'), ('March', 'March'),
-                                    ('April', 'April'), ('May', 'May'), ('June', 'June'), ('July', 'July'),
-                                    ('August', 'August'), ('September', 'September'), ('October', 'October'),
-                                    ('November', 'November'), ('December', 'December')])
-    expyear = IntegerField('Exp year', validators=[InputRequired(), NumberRange(min=2020, max=3000)])
-    cvv = IntegerField('CVV', validators=[InputRequired(), NumberRange(min=0, max=999)])
+    cardNum = IntegerField('Credit card number', validators=[InputRequired(), NumberRange(max=9999)])
+    expmonth = SelectField(label='Card Expiry', validators=[InputRequired()],
+                           choices=[('January', '01'), ('February', '02'), ('March', '03'),
+                                    ('April', '04'), ('May', '05'), ('June', '06'), ('July', '07'),
+                                    ('August', '08'), ('September', '09'), ('October', '10'),
+                                    ('November', '11'), ('December', '12')])
+    expyear = SelectField(validators=[InputRequired()], choices=[('2025', '25'), ('2016', '24'), ('2023', '23'),
+                                                               ('2022', '22'), ('2021', '21'), ('2020', '20')])
+    cvv = IntegerField('CVV', validators=[InputRequired(), NumberRange(max=999)])
     # rmb = BooleanField('')

@@ -179,6 +179,10 @@ def signup():
 @app.route('/payment', methods=['GET', 'POST'])
 def payment():
     form = PaymentForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            print('Payment successful')
+            return redirect(url_for('home'))
     return render_template('payment.html', title='Payment', form=form)
 
 
