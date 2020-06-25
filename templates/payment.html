@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}payment page{% endblock %}
+{% block title %}CB Shop - Payment{% endblock %}
 
 
 
@@ -72,7 +72,7 @@
     </p>
     <p>
         {{ form.expmonth.label }} <br>
-        {{ form.expmonth(size=10) }} <br>
+        {{ form.expmonth() }} <br>
         {% for error in form.expmonth.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}

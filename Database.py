@@ -205,9 +205,9 @@ def update_js():
         data.append([row[1], row[2], row[3], row[4], row[6]])
     data1 = json.dumps(data)
     print(data1)
-
     js = open("static/js/Shop.js", 'w')
     js.write("function CreateList(){ var data = " + "{}".format(data1) + "; return data}")
+    print('js updated')
     js.close()
 
 
