@@ -13,7 +13,9 @@ class UserLoginForm(FlaskForm):
 class CreateUserForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
     email = StringField('Email', validators=[InputRequired(), Email(message="Invalid Email"), Length(max=60)])
-    password = PasswordField('Password', validators=[InputRequired()])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=150)])
+    confirmPassword = PasswordField('Confirm Password',
+                                    validators=[InputRequired(), EqualTo('password', message="Password does not match")])
     # confirmPassword = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password')])
     # submit = SubmitField('Sign up!')
 

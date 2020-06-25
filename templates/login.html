@@ -3,6 +3,25 @@
 {% from "includes/_formHelper.html" import render_field %}
 
 {% block content %}
+<h1>Login</h1>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script>
+    function delete_flash(flash){
+        $(flash).parent().remove()
+    }
+</script>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                <span>{{ message }}</span>
+                <i class="close icon" onclick=delete_flash(this)>
+                <span aria-hidden="true">&times;</span>
+                </i>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <form method="POST" action="" novalidate>
         {{ form.hidden_tag() }}
         <p>
