@@ -135,6 +135,7 @@ class Product(db.Model):
     product_description = Column(String)
     product_stock = Column(Integer)
     product_image = Column(String)
+    product_review = Column(String)
 
 class User(db.Model):
     id = Column(Integer, primary_key=True)
