@@ -216,6 +216,7 @@ class Reviews(db.Model):
     id = Column(Integer, ForeignKey("users"))
     review = Column(String)
 
+
 # to update the js file for the shop
 def update_js():
     statement = sql.text('SELECT * FROM products')
@@ -226,7 +227,17 @@ def update_js():
     data1 = json.dumps(data)
     print(data1)
 
+    statement = sql.text('SELECT * FROM reviews')
+    result = db.engine.execute(statement)
+    data = []
+    for row in result:
+        search_statement = sql.text('SELECT username FROM users WHERE id = ' + str(row[2]))
+        username = db.engine.execute(search_statement)
+        data.append([row[1], username.fetchone()[0], row[3]])
+    data2 = json.dumps(data)
+    print(data2)
+
     js = open("static/js/Shop.js", 'w')
-    js.write("function CreateList(){ var data = " + "{}".format(data1) + "; return data}")
+    js.write("function CreateList(){ var data = " + "{data}".format(data=data1) + ";return data}" + "function CreateReview(){var reviews = " + "{data}".format(data=data2) + "; return reviews}")
     print('js updated')
     js.close()

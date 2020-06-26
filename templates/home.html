@@ -75,10 +75,10 @@ div#item-details > span{
     margin: 5px 0px;
 }
 
-div.reviews{
-     overflow-y: scroll;
-     height: 200px;
-     border: 2px white solid
+textarea{
+    height:200px;
+    width:300px;
+    resize: none;
 }
 </style>
 {% endblock %}
@@ -123,7 +123,8 @@ div.reviews{
                 <div class="row">
                     <h6>Reviews</h6>
                 </div>
-                <div class="row reviews">
+                <div class="row">
+                    <textarea class="reviews" disabled></textarea>
                 </div>
                 <div class="row" style="margin-top:10%">
                     <h6>Enter a review</h6>

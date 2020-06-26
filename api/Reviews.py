@@ -2,7 +2,7 @@ from flask import Blueprint, request, redirect, url_for
 from flask_login import current_user
 from Database import Reviews
 from sqlalchemy.sql import text
-from Database import db
+from Database import db, update_js
 
 review_api = Blueprint('review_api', __name__)
 
@@ -27,4 +27,5 @@ def test(product_id):
             result = db.engine.execute(statement)
             for row in result:
                 print(row)
+            update_js()
     return redirect(url_for('home'))
