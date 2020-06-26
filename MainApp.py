@@ -148,7 +148,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         # if user is None or not user.check_password(form.password.data):
         if user:
-            if check_password_hash(user.password, form.password.data):
+            if user.password == form.password.data:
                 login_user(user, remember=form.remember_me.data)
                 user.activate_is_authenticated()
                 print(user.is_authenticated)
@@ -188,8 +188,8 @@ def signup():
         exists = db.session.query(User.id).filter_by(email=form.email.data).scalar()
         exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
         if exists is None and exists2 is None:
-            hashed_password = generate_password_hash(form.password.data, method='sha256')
-            newuser = User(username=form.username.data, email=form.email.data, password=hashed_password, urole='customer', is_active=True, is_authenticated=False)
+            # hashed_password = generate_password_hash(form.password.data, method='sha256')
+            newuser = User(username=form.username.data, email=form.email.data, password=form.password.data, urole='customer', is_active=True, is_authenticated=False)
             # Role.create('customer')
 
             # newuser.roles.append(Role(name='customer', id=2))
