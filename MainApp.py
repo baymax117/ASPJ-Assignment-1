@@ -10,13 +10,13 @@ import os
 #from datetime import timedelta
 from api.Cart import cart_api
 from api.Reviews import review_api
-from api.User_infotest import user_infotest_api
+# from api.User_infotest import user_infotest_api
 
 
 app = Flask(__name__)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
-app.register_blueprint(user_infotest_api, url_prefix='/api/User_infotest')
+# app.register_blueprint(user_infotest_api, url_prefix='/api/User_infotest')
 
 
 
