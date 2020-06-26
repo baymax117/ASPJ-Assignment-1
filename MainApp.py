@@ -76,6 +76,7 @@ def home():
     for row in results:
         products.append([row[1], row[3], row[6]])
     length = len(products)
+    print(user)
     return render_template('home.html', products=products, length=length, user=user)
 
 
@@ -211,7 +212,6 @@ def cart():
     return render_template('cart.html')
 
 
-
 @app.route('/payment', methods=['GET', 'POST'])
 def payment():
     if current_user is None:
@@ -226,13 +226,10 @@ def payment():
     return render_template('payment.html', title='Payment', form=form, user=user)
 
 
-
-
 @app.route('/admin_test', methods=['GET', 'POST'])
 @login_required('admin')
 def admin_test():
     return render_template('admin_page.html'), 200
-
 
 
 def reset_database():
