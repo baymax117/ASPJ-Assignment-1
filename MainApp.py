@@ -64,7 +64,6 @@ def home():
     products = []
     # products -> 0: name | 1: price | 2: image
     for row in results:
-        print(row)
         products.append([row[1], row[3], row[6]])
     length = len(products)
     return render_template('home.html', products=products, length=length, user=user)
@@ -123,9 +122,7 @@ def login():
     #     return redirect(url_for('home'))
     # if request.method == 'POST':
     #     session.pop('user', None)
-
     form = UserLoginForm()
-
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         # if user is None or not user.check_password(form.password.data):
