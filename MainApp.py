@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify
 from Forms import UserLoginForm, CreateUserForm, PaymentForm
-from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
+from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin, AnonymousUserMixin
 from functools import wraps
 from sqlalchemy.sql import text
 from uuid import uuid4
@@ -10,10 +10,16 @@ import os
 #from datetime import timedelta
 from api.Cart import cart_api
 from api.Reviews import review_api
+from api.User_infotest import user_infotest_api
+
 
 app = Flask(__name__)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
+app.register_blueprint(user_infotest_api, url_prefix='/api/User_infotest')
+
+
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
@@ -24,9 +30,16 @@ app.config['SECRET_KEY'] = "asp-project-security"
 db.app = app
 db.init_app(app)
 
+class Anonymous(AnonymousUserMixin):
+    def __init__(self):
+        self.username = 'Guest'
+
+
+
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+# login_manager.anonymous_user = Anonymous
 
 # login_manager.refresh_view = 'relogin'
 # login_manager.needs_refresh_message = (u"Session timedout, please re-login")
@@ -132,6 +145,7 @@ def before_request():
         # app.permanent_session_lifetime = timedelta(minutes=1)
 
 
+
 @app.route('/dropsession')
 def dropsession():
     session.pop('user', None)
@@ -146,6 +160,7 @@ def login():
     #     return redirect(url_for('home'))
     # if request.method == 'POST':
     #     session.pop('user', None)
+
     form = UserLoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -170,15 +185,30 @@ def login():
 
 @app.route('/logout')
 def logout():
-    print("id", current_user.id)
+    # if current_user == Anonymous:
+    #     user = Anonymous
+    #     return redirect(url_for('login'))
+    # else:
+    if current_user.is_anonymous:
+        return redirect(url_for('login'))
+
+    print("here 1", current_user == None)
+    print("here",current_user)
+    user = current_user
+    print("id", user.id)
     # print("name",current_user.username)
     # print("not log out yet", current_user.is_authenticate())
-    current_user.deactivate_is_authenticated()
-    db.session.add(current_user)
+    user.deactivate_is_authenticated()
+    db.session.add(user)
     db.session.commit()
     # print("log out le",current_user.is_authenticate())
     logout_user()
     return redirect(url_for("home"))
+
+    # if Anonymous:
+    #     return redirect(url_for('login'))
+    # else:
+
 
 
 @app.route('/signup', methods=['GET', 'POST'])
