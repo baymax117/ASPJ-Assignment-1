@@ -8,9 +8,13 @@ from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 #from datetime import timedelta
-
+from api.Cart import cart_api
+from api.Reviews import review_api
 
 app = Flask(__name__)
+app.register_blueprint(cart_api, url_prefix='/api/Cart')
+app.register_blueprint(review_api, url_prefix='/api/Reviews')
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
@@ -141,9 +145,7 @@ def login():
     #     return redirect(url_for('home'))
     # if request.method == 'POST':
     #     session.pop('user', None)
-
     form = UserLoginForm()
-
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         # if user is None or not user.check_password(form.password.data):
@@ -217,6 +219,10 @@ def payment():
     else:
         user = current_user
     form = PaymentForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            print('Payment successful')
+            return redirect(url_for('home'))
     return render_template('payment.html', title='Payment', form=form, user=user)
 
 

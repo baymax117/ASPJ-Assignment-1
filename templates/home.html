@@ -1,17 +1,6 @@
 {% extends "base.html" %}
 {% block title %}CB Shop{% endblock %}
 
-{% block SearchBar %}
-<ul class="navbar-nav w-100 justify-content-center">
-    <li class="nav-item active">
-        <form class="form-inline my-2 my-lg-0" action="">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="Search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
-    </li>
-</ul>
-{% endblock %}
-
 {% block style %}
 <style>
 div.item-container{
@@ -85,6 +74,12 @@ div#item-details{
 div#item-details > span{
     margin: 5px 0px;
 }
+
+div.reviews{
+     overflow-y: scroll;
+     height: 200px;
+     border: 2px white solid
+}
 </style>
 {% endblock %}
 
@@ -115,12 +110,33 @@ div#item-details > span{
 
 <div class="overlay">
     <div class="overlay-item">
-        <img src="" id="item-image">
-            <div id="item-details"></div>
-        <hr>
-        <span>Description:</span>
-        <p id="item-desc"></p>
-        <button class="btn btn-primary">Add To Cart</button>
+        <div class="row">
+            <div class="col">
+                <img src="" id="item-image">
+                    <div id="item-details"></div>
+                <hr>
+                <span>Description:</span>
+                <p id="item-desc"></p>
+                <button class="btn btn-primary">Add To Cart</button>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <h6>Reviews</h6>
+                </div>
+                <div class="row reviews">
+                </div>
+                <div class="row" style="margin-top:10%">
+                    <h6>Enter a review</h6>
+                </div>
+                <div class="row input">
+                    <form id="form-review" action="/api/Cart/greet" method="post">
+                        <textarea form="form-review" name="comment" style="height:200px; width:300px; resize: none"></textarea>
+                        <br>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -160,10 +176,20 @@ $(document).ready(function(){
 
     // hide overlay when overlay is clicked
     $(".overlay").on('click', function(){
-        $(".overlay").hide();
-        $("#item-name").text('');
+        if (!($(".overlay-item").data('clicked'))){
+            $(".overlay").hide();
+            $("#item-details").text('');
+            $("#item-image").attr('src', '../static/img/None.png');
+            $(".overlay-item").data('clicked', false)
+            }
+        else{
+            $(".overlay-item").data('clicked', false);
+        }
     });
 
+    $(".overlay-item").on('click', function(){
+        $(this).data('clicked', true);
+    });
 })
 </script>
 {% endblock %}

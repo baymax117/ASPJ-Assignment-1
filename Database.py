@@ -135,6 +135,7 @@ class Product(db.Model):
     product_description = Column(String)
     product_stock = Column(Integer)
     product_image = Column(String)
+    product_review = Column(String)
 
 class User(db.Model):
     id = Column(Integer, primary_key=True)
@@ -204,7 +205,7 @@ def update_js():
     result = db.engine.execute(statement)
     data = []
     for row in result:
-        data.append([row[1], row[2], row[3], row[4], row[6]])
+        data.append([row[0], row[1], row[2], row[3], row[4], row[6]])
     data1 = json.dumps(data)
     print(data1)
 
