@@ -3,6 +3,7 @@ from sqlalchemy import Column, Integer, String, Float, sql, Boolean
 import json
 from flask_marshmallow import Marshmallow
 
+
 db = SQLAlchemy()
 ma = Marshmallow()
 
@@ -137,6 +138,8 @@ class Product(db.Model):
     product_image = Column(String)
     product_review = Column(String)
 
+
+
 class User(db.Model):
     id = Column(Integer, primary_key=True)
     username = Column(String(64))
@@ -144,6 +147,7 @@ class User(db.Model):
     password = Column(String(128))
     is_authenticated = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
+    is_anonymous = Column(Boolean, default=False)
     urole=Column(String(80))
 
 
