@@ -26,8 +26,6 @@ app.register_blueprint(user_login_toinfotest_api, url_prefix='/api/login_toinfot
 
 
 
-
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
 app.config['JWT_SECRET_KEY'] = 'asp-project-security-api'
@@ -83,7 +81,7 @@ def load_user(id):
 @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    if current_user is None:
+    if current_user.is_anonymous:
         user = None
     else:
         user = current_user
@@ -94,9 +92,7 @@ def home():
     for row in results:
         products.append([row[1], row[3], row[6]])
     length = len(products)
-    print(user)
     return render_template('home.html', products=products, length=length, user=user)
-
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -184,7 +180,7 @@ def login():
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
 
-    return render_template('login.html', form=form, title="Login in")
+    return render_template('login.html', form=form, title="Login in", user=None)
 
 
 @app.route('/logout')
