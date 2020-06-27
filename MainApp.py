@@ -28,10 +28,10 @@ app.config['SECRET_KEY'] = "asp-project-security"
 db.app = app
 db.init_app(app)
 
+
 class Anonymous(AnonymousUserMixin):
     def __init__(self):
         self.username = 'Guest'
-
 
 
 login_manager = LoginManager(app)
@@ -76,7 +76,7 @@ def load_user(id):
 @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    if current_user is None:
+    if current_user.is_anonymous:
         user = None
     else:
         user = current_user
@@ -87,9 +87,7 @@ def home():
     for row in results:
         products.append([row[1], row[3], row[6]])
     length = len(products)
-    print(user)
     return render_template('home.html', products=products, length=length, user=user)
-
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -178,7 +176,7 @@ def login():
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
 
-    return render_template('login.html', form=form, title="Login in")
+    return render_template('login.html', form=form, title="Login in", user=None)
 
 
 @app.route('/logout')

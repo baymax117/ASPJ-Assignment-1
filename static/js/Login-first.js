@@ -45,6 +45,6 @@ $(document).ready(function(){
         $(this).data('clicked', true);
     });
 
-    $(".form-review").attr('action', '/login');
+    $("#form-review").attr('action', '/login');
     $(".add-cart").attr('action', '/login');
 })

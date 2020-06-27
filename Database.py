@@ -153,6 +153,7 @@ class User(db.Model):
     password = Column(String(128))
     is_authenticated = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
+    is_anonymous = Column(Boolean, default=False)
     urole = Column(String(80))
     user_reviews = relationship("Reviews")
 

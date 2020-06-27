@@ -8,7 +8,7 @@ review_api = Blueprint('review_api', __name__)
 
 
 @review_api.route('/add/<int:product_id>', methods=["POST", "GET"])
-def test(product_id):
+def add(product_id):
     if request.method == "POST":
         if current_user is not None:
             statement = text("SELECT review_id FROM reviews")
