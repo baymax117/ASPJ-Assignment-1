@@ -24,6 +24,12 @@ $(document).ready(function(){
                 else{
                     $("#item-image").attr('src', '../static/img/None.png');
                 }
+                for (entry in reviews){
+                console.log(entry)
+                    if (reviews[entry][0] == data[product][0]){
+                        $(".reviews").html($(".reviews").html() + reviews[entry][1] + ": " + reviews[entry][2] + "\n")
+                    };
+                };
             };
         };
     });
@@ -34,7 +40,8 @@ $(document).ready(function(){
             $(".overlay").hide();
             $("#item-details").text('');
             $("#item-image").attr('src', '../static/img/None.png');
-            $(".overlay-item").data('clicked', false)
+            $(".overlay-item").data('clicked', false);
+            $(".reviews").html("");
             }
         else{
             $(".overlay-item").data('clicked', false);
