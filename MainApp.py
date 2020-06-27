@@ -1,32 +1,48 @@
 from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify
-from Forms import UserLoginForm, CreateUserForm, PaymentForm
+from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm ,PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 from functools import wraps
 from sqlalchemy.sql import text
 from uuid import uuid4
 from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import os
 #from datetime import timedelta
 from api.Cart import cart_api
 from api.Reviews import review_api
+from api.User_infotest import user_infotest_api
+from api.Login_first import user_login_toinfotest_api
+from api.User_info_admin import user_info_admin_api
+
+
 
 app = Flask(__name__)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
+app.register_blueprint(user_infotest_api, url_prefix='/api/User_infotest')
+app.register_blueprint(user_info_admin_api, url_prefix='/api/user_info_admin')
+app.register_blueprint(user_login_toinfotest_api, url_prefix='/api/login_toinfotest')
+
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
+app.config['JWT_SECRET_KEY'] = 'asp-project-security-api'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
 # SECRET_KEY = os.environ.get('SECRET_KEY') or "asp-project-security"
 app.config['SECRET_KEY'] = "asp-project-security"
 
 db.app = app
 db.init_app(app)
+jwt = JWTManager(app)
+
+
 
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+# login_manager.anonymous_user = Anonymous
 
 # login_manager.refresh_view = 'relogin'
 # login_manager.needs_refresh_message = (u"Session timedout, please re-login")
@@ -65,7 +81,7 @@ def load_user(id):
 @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    if current_user is None:
+    if current_user.is_anonymous:
         user = None
     else:
         user = current_user
@@ -74,11 +90,9 @@ def home():
     products = []
     # products -> 0: name | 1: price | 2: image
     for row in results:
-        print(row)
         products.append([row[1], row[3], row[6]])
     length = len(products)
     return render_template('home.html', products=products, length=length, user=user)
-
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -148,12 +162,11 @@ def login():
     #     session.pop('user', None)
 
     form = UserLoginForm()
-
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         # if user is None or not user.check_password(form.password.data):
         if user:
-            if check_password_hash(user.password, form.password.data):
+            if user.password == form.password.data:
                 login_user(user, remember=form.remember_me.data)
                 user.activate_is_authenticated()
                 print(user.is_authenticated)
@@ -167,20 +180,35 @@ def login():
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
 
-    return render_template('login.html', form=form, title="Login in")
+    return render_template('login.html', form=form, title="Login in", user=None)
 
 
 @app.route('/logout')
 def logout():
-    print("id", current_user.id)
+    # if current_user == Anonymous:
+    #     user = Anonymous
+    #     return redirect(url_for('login'))
+    # else:
+    if current_user.is_anonymous:
+        return redirect(url_for('login'))
+
+    print("here 1", current_user == None)
+    print("here",current_user)
+    user = current_user
+    print("id", user.id)
     # print("name",current_user.username)
     # print("not log out yet", current_user.is_authenticate())
-    current_user.deactivate_is_authenticated()
-    db.session.add(current_user)
+    user.deactivate_is_authenticated()
+    db.session.add(user)
     db.session.commit()
     # print("log out le",current_user.is_authenticate())
     logout_user()
     return redirect(url_for("home"))
+
+    # if Anonymous:
+    #     return redirect(url_for('login'))
+    # else:
+
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -193,10 +221,13 @@ def signup():
         exists = db.session.query(User.id).filter_by(email=form.email.data).scalar()
         exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
         if exists is None and exists2 is None:
-            hashed_password = generate_password_hash(form.password.data, method='sha256')
-            newuser = User(username=form.username.data, email=form.email.data, password=hashed_password, urole='customer', is_active=True, is_authenticated=False)
-            # Role.create('customer')
+            # hashed_password = generate_password_hash(form.password.data, method='sha256')
+            newuser = User(username=form.username.data, email=form.email.data, password=form.password.data,
+                           security_questions=form.security_questions.data,
+                           security_questions_answer=form.security_questions_answer.data,
+                           urole='customer', is_active=True, is_authenticated=False)
 
+            # Role.create('customer')
             # newuser.roles.append(Role(name='customer', id=2))
             # newuser.set_password(form.password.data)
             db.session.add(newuser)
@@ -208,11 +239,41 @@ def signup():
         return redirect(url_for('signup'))
     return render_template('sign up.html', title="Sign Up", form=form)
 
+@app.route('/forgotpassword', methods=['GET', 'POST'])
+def forgotpassword():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    form1 = ForgetPasswordForm_Email()
+    if form1.validate_on_submit():
+        email_exist = db.session.query(User.id).filter_by(email=form1.email.data).scalar()
+        if email_exist is not None:
+            form2 = ForgetPasswordForm()
+            user = User.query.filter_by(email=form1.email.data).first()
+            security_questions = user.security_questions
+            if form2.validate_on_submit():
+                if user.security_questions_answer == form2.security_questions_answer.data:
+                    update_user = User.query.filter_by(email=form1.email.data).first()
+                    update_user.password = form2.newpassword.data
+                    db.session.commit()
+                    flash("You have successfully reset your password")
+                    return redirect(url_for('login'))
+                else:
+                    flash("Incorrect security questions answer")
+                    return redirect(url_for('forgotpassword'))
+        else:
+            flash('Email does not exist')
+            return redirect((url_for('forgotpassword')))
+        return render_template('forgot_password.html', title='Reset Password',form1=form1, form2=form2, security_questions=security_questions)
+
+    return render_template('forgot_password.html', title='Reset Password', form1=form1)
+
+
+
 
 @app.route('/cart')
 def cart():
     return render_template('cart.html')
-
 
 
 @app.route('/payment', methods=['GET', 'POST'])
@@ -229,13 +290,10 @@ def payment():
     return render_template('payment.html', title='Payment', form=form, user=user)
 
 
-
-
 @app.route('/admin_test', methods=['GET', 'POST'])
 @login_required('admin')
 def admin_test():
     return render_template('admin_page.html'), 200
-
 
 
 def reset_database():

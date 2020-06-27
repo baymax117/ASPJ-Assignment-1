@@ -74,6 +74,12 @@ div#item-details{
 div#item-details > span{
     margin: 5px 0px;
 }
+
+textarea{
+    height:150px;
+    width:200px;
+    resize: none;
+}
 </style>
 {% endblock %}
 
@@ -104,55 +110,43 @@ div#item-details > span{
 
 <div class="overlay">
     <div class="overlay-item">
-        <img src="" id="item-image">
-            <div id="item-details"></div>
-        <hr>
-        <span>Description:</span>
-        <p id="item-desc"></p>
-        <button class="btn btn-primary">Add To Cart</button>
+        <div class="row">
+            <div class="col">
+                <img src="" id="item-image">
+                    <div id="item-details"></div>
+                <hr>
+                <span>Description:</span>
+                <p id="item-desc"></p>
+                <button class="btn btn-primary add-cart">Add To Cart</button>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <h6>Reviews</h6>
+                </div>
+                <div class="row">
+                    <textarea class="reviews" disabled></textarea>
+                </div>
+                <div class="row" style="margin-top:10%">
+                    <h6>Enter a review</h6>
+                </div>
+                <div class="row input">
+                    <form id="form-review" action="" method="post">
+                        <textarea form="form-review" name="comment"></textarea>
+                        <br>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block function %}
 <script src="../static/js/Shop.js"></script>
-<script>
-var data = CreateList()
-$(document).ready(function(){
-    // "pop up" item when mouse enters the box
-    $('.item-container').on('mouseenter', function(){
-        $(this).addClass('item-container-active');
-    });
-
-    // revert item when mouse leaves the box
-    $('.item-container').on('mouseleave', function(){
-        $(this).removeClass('item-container-active');
-    });
-
-    // show overlay when item is clicked
-    $(".item-container").on('click', function(){
-        var item = $(this).attr('id');
-        $(".overlay").show();
-        for (product in data){
-            if (data[product][0] == item){
-                $("#item-details").html('<span>' + data[product][0] + '</span><br><span>' + data[product][1] + '</span><br><span>Price: $' + data[product][2].toFixed(2) + "</span>");
-                $("#item-desc").text(data[product][3]);
-                if (data[product][4] != null){
-                    $("#item-image").attr('src', '../static/img/' + data[product][4]);
-                }
-                else{
-                    $("#item-image").attr('src', '../static/img/None.png');
-                }
-            };
-        };
-    });
-
-    // hide overlay when overlay is clicked
-    $(".overlay").on('click', function(){
-        $(".overlay").hide();
-        $("#item-name").text('');
-    });
-
-})
-</script>
+{% if user is none %}
+<script src="../static/js/login-first.js"></script>
+{% else %}
+<script src="../static/js/Product.js"></script>
+{% endif %}
 {% endblock %}
