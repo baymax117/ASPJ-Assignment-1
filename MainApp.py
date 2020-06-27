@@ -19,8 +19,6 @@ app.register_blueprint(review_api, url_prefix='/api/Reviews')
 # app.register_blueprint(user_infotest_api, url_prefix='/api/User_infotest')
 
 
-
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
