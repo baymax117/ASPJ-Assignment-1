@@ -101,34 +101,34 @@ def db_seed(database):
     database.session.add(toilet_paper_3py)
     database.session.add(toilet_paper_4py)
 
-    john = User(
-        username='JohnDoe',
-        email='johnD@email.com',
-        password='abcd1234',
-        urole='Admin',
-        is_authenticated=False,
-        is_active=False)
+    # john = User(
+    #     username='JohnDoe',
+    #     email='johnD@email.com',
+    #     password='abcd1234',
+    #     urole='Admin',
+    #     is_authenticated=False,
+    #     is_active=False)
+    #
+    # mary = User(
+    #     username='MaryJane',
+    #     email='maryJ@email.com',
+    #     password='abcd1234',
+    #     urole='customer',
+    #     is_authenticated=False,
+    #     is_active=False)
+    #
+    # peter = User(
+    #     username='Spidey',
+    #     email='pparker@email.com',
+    #     password='abcd1234',
+    #     urole='customer',
+    #     is_authenticated=False,
+    #     is_active=False)
 
-    mary = User(
-        username='MaryJane',
-        email='maryJ@email.com',
-        password='abcd1234',
-        urole='customer',
-        is_authenticated=False,
-        is_active=False)
 
-    peter = User(
-        username='Spidey',
-        email='pparker@email.com',
-        password='abcd1234',
-        urole='customer',
-        is_authenticated=False,
-        is_active=False)
-
-
-    database.session.add(john)
-    database.session.add(mary)
-    database.session.add(peter)
+    # database.session.add(john)
+    # database.session.add(mary)
+    # database.session.add(peter)
 
     database.session.commit()
     print('database seeded')
@@ -155,6 +155,7 @@ class User(db.Model):
     security_questions = Column(String(128))
     security_questions_answer = Column(String(128))
     is_authenticated = Column(Boolean, default=False)
+    is_anonymous = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
     is_anonymous = Column(Boolean, default=False)
     urole = Column(String(80))
