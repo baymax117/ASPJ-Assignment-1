@@ -44,7 +44,7 @@ $(document).ready(function(){
             $("#form-review").attr('action', '');
             $("#item-image").attr('src', '../static/img/None.png');
             $(".overlay-item").data('clicked', false)
-            $(".reviews").html = "";
+            $(".reviews").html("");
             }
         else{
             $(".overlay-item").data('clicked', false);
