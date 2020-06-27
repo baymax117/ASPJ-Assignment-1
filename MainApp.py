@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify
 from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm ,PaymentForm
-from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin, AnonymousUserMixin
+from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 from functools import wraps
 from sqlalchemy.sql import text
 from uuid import uuid4
@@ -16,12 +16,14 @@ from api.Login_first import user_login_toinfotest_api
 from api.User_info_admin import user_info_admin_api
 
 
+
 app = Flask(__name__)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
 app.register_blueprint(user_infotest_api, url_prefix='/api/User_infotest')
 app.register_blueprint(user_info_admin_api, url_prefix='/api/user_info_admin')
 app.register_blueprint(user_login_toinfotest_api, url_prefix='/api/login_toinfotest')
+
 
 
 
@@ -36,10 +38,6 @@ app.config['SECRET_KEY'] = "asp-project-security"
 db.app = app
 db.init_app(app)
 jwt = JWTManager(app)
-
-class Anonymous(AnonymousUserMixin):
-    def __init__(self):
-        self.username = 'Guest'
 
 
 
@@ -96,6 +94,7 @@ def home():
     for row in results:
         products.append([row[1], row[3], row[6]])
     length = len(products)
+    print(user)
     return render_template('home.html', products=products, length=length, user=user)
 
 
@@ -281,7 +280,6 @@ def cart():
     return render_template('cart.html')
 
 
-
 @app.route('/payment', methods=['GET', 'POST'])
 def payment():
     if current_user is None:
@@ -296,13 +294,10 @@ def payment():
     return render_template('payment.html', title='Payment', form=form, user=user)
 
 
-
-
 @app.route('/admin_test', methods=['GET', 'POST'])
 @login_required('admin')
 def admin_test():
     return render_template('admin_page.html'), 200
-
 
 
 def reset_database():
