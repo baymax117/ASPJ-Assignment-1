@@ -63,6 +63,20 @@
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </p>
+    <p>
+        {{ form.security_questions.label }} <br>
+        {{ form.security_questions(size=1) }} <br>
+        {% for error in form.security_questions.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.security_questions_answer.label }} <br>
+        {{ form.security_questions_answer(size=32) }} <br>
+        {% for error in form.security_questions_answer.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
 
     <button type="submit">Sign Up</button>
 </form>
