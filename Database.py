@@ -95,29 +95,29 @@ def db_seed(database):
     database.session.add(toilet_paper_3py)
     database.session.add(toilet_paper_4py)
 
-    john = User(
-                username='JohnDoe',
-                email='johnD@email.com',
-                password='abcd1234',
-                urole='Admin',
-                is_authenticated=False,
-                is_active=False)
-
-    mary = User(
-                username='MaryJane',
-                email='maryJ@email.com',
-                password='abcd1234',
-                urole='customer',
-                is_authenticated=False,
-                is_active=False)
-
-    peter = User(
-                 username='Spidey',
-                 email='pparker@email.com',
-                 password='abcd1234',
-                 urole='customer',
-                 is_authenticated=False,
-                 is_active=False)
+    # john = User(
+    #             username='JohnDoe',
+    #             email='johnD@email.com',
+    #             password='abcd1234',
+    #             urole='Admin',
+    #             is_authenticated=False,
+    #             is_active=False)
+    #
+    # mary = User(
+    #             username='MaryJane',
+    #             email='maryJ@email.com',
+    #             password='abcd1234',
+    #             urole='customer',
+    #             is_authenticated=False,
+    #             is_active=False)
+    #
+    # peter = User(
+    #              username='Spidey',
+    #              email='pparker@email.com',
+    #              password='abcd1234',
+    #              urole='customer',
+    #              is_authenticated=False,
+    #              is_active=False)
 
     # database.session.add(john_assign)
     # database.session.add(mary_assign)
@@ -145,16 +145,20 @@ class User(db.Model):
     username = Column(String(64))
     email = Column(String(120), index=True, unique=True)
     password = Column(String(128))
+    security_questions = Column(String(128))
+    security_questions_answer = Column(String(128))
     is_authenticated = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
     is_anonymous = Column(Boolean, default=False)
     urole=Column(String(80))
 
 
-    def __init__(self, username, password, email,is_active, is_authenticated ,urole):
+    def __init__(self, username, password, email, security_questions  ,security_questions_answer ,is_active, is_authenticated ,urole):
         self.username = username
         self.password = password
         self.email = email
+        self.security_questions = security_questions
+        self.security_questions_answer = security_questions_answer
         self.is_active = is_active
         self.is_authenticated = is_authenticated
         self.urole = urole

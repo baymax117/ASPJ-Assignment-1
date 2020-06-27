@@ -16,8 +16,33 @@ class CreateUserForm(FlaskForm):
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=150)])
     confirmPassword = PasswordField('Confirm Password',
                                     validators=[InputRequired(), EqualTo('password', message="Password does not match")])
+
+    security_questions = SelectField(label="Security question (in case you forgot your password)", validators=[InputRequired()],
+                                     choices=[('Mother\'s middle name', 'Mother\'s middle name'),
+                                              ('Your\'s pet name', 'Your\'s pet name'),
+                                              ('Your favourite food','Your favourite food')])
+    security_questions_answer = StringField('Your secret answer', validators=[InputRequired()])
+
+
     # confirmPassword = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password')])
     # submit = SubmitField('Sign up!')
+
+class ForgetPasswordForm_Email(FlaskForm):
+    email = StringField('Email', validators=[InputRequired(), Email(message="Invalid Email"), Length(max=60)])
+
+class ForgetPasswordForm(FlaskForm):
+    security_questions = StringField(label="Security question")
+    # security_questions = StringField(label="Security question",
+    #                                  validators=[InputRequired()],
+    #                                  choices=[('Mother\'s middle name', 'Mother\'s middle name'),
+    #                                           ('Your\'s pet name', 'Your\'s pet name'),
+    #                                           ('Your favourite food', 'Your favourite food')])
+    security_questions_answer = StringField('Your secret answer', validators=[InputRequired()])
+
+    newpassword = PasswordField('new password', validators=[InputRequired(), Length(min=8, max=150)])
+    newconfirmPassword = PasswordField('Confirm Password',
+                                    validators=[InputRequired(),EqualTo('newpassword',
+                                                                        message="Password does not match")])
 
 
 class PaymentForm(FlaskForm):
