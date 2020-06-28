@@ -155,6 +155,18 @@ class Product(db.Model):
     product_reviews = relationship("Reviews")
 
 
+class Product(db.Model):
+    __tablename__ = 'products'
+    product_id = Column(Integer, primary_key=True)
+    product_name = Column(String)
+    product_type = Column(String)
+    product_price = Column(Float)
+    product_description = Column(String)
+    product_stock = Column(Integer)
+    product_image = Column(String)
+    product_reviews = relationship("Reviews")
+
+
 class User(db.Model):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
@@ -166,13 +178,12 @@ class User(db.Model):
     is_authenticated = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
     is_anonymous = Column(Boolean, default=False)
-    is_admin = Column(Boolean, default=False)
+    urole = Column(String(80))
     user_reviews = relationship("Reviews")
     cart = relationship("Cart")
-    # order = relationship("Order")
 
     def __init__(self, username, password, email, security_questions, security_questions_answer, is_active,
-                 is_authenticated, is_admin=False):
+                 is_authenticated, urole):
         self.username = username
         self.password = password
         self.email = email
@@ -180,7 +191,7 @@ class User(db.Model):
         self.security_questions_answer = security_questions_answer
         self.is_active = is_active
         self.is_authenticated = is_authenticated
-        self.is_admin = is_admin
+        self.urole = urole
 
     def is_authenticate(self):
         return self.is_authenticated
@@ -194,22 +205,19 @@ class User(db.Model):
     def get_id(self):
         return self.id
 
-    def get_is_active(self):
-        return self.is_active
-
     def activate_user(self):
         self.is_active = True
 
     def get_username(self):
         return self.username
 
-    def get_is_admin(self):
-        return self.is_admin
+    def get_urole(self):
+        return self.urole
 
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'username', 'email', 'password', 'is_authenticated', 'is_active', 'is_admin')
+        fields = ('id', 'username', 'email', 'password', 'is_authenticated', 'is_active', 'urole')
 
 
 class Payment(db.Model):
