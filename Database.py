@@ -215,7 +215,7 @@ class UserSchema(ma.Schema):
 class Payment(db.Model):
     __tablename__ = 'cards'
     name = Column(String(150))
-    email = Column(String(120), unique=True)
+    email = Column(String(120))
     address = Column(String(150))
     country = Column(String(56))
     city = Column(String(150))
@@ -225,6 +225,8 @@ class Payment(db.Model):
     expmonth = Column(String(9))
     expyear = Column(Integer)
     cvv = Column(Integer)
+    id = Column(Integer, ForeignKey('users'))
+    rememberinfo = Column(Boolean, default=False)
 
 
 class Reviews(db.Model):

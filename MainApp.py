@@ -323,9 +323,39 @@ def payment():
         user = None
     else:
         user = current_user
+    # cardlist = []
+    # statement = text('SELECT * FROM cards WHERE id = {}'.format(current_user.id))
+    # results = db.engine.execute(statement)
+    # print(results)
+    # for row in results:
+    #     remember = Payment.query.filter_by(rememberinfo=True).first()
+    #     print(remember)
+    #     # card = Payment.query.filter_by(cardnum=row[1]).first()
+    #     #print(row)
+    #     cardlist.append(row)
+
+
     form = PaymentForm()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        print(request.form.getlist('Remember_info'))
+        if form.validate_on_submit() and request.form.getlist('Remember_info') == ['Remember_info']:
+            print("PATH 1 ")
+            exist_cardnum = db.session.query(Payment.cardnum).filter_by(cardnum=form.cardNum.data).first()
+            print(exist_cardnum)
+            if exist_cardnum:
+                print("PATH 1.1 ")
+                print('Payment successful')
+                while True:
+                    product = Cart.query.filter_by(cart_id=current_user.id).first()
+                    if product is None:
+                        break
+                    else:
+                        db.session.delete(product)
+                        db.session.commit()
+                return redirect(url_for('home'))
+            #print(request.form.getlist('Remember_info'))
+
+            print("PATH 1.2 ")
             card = Payment(name=form.name.data,
                            email=form.email.data,
                            address=form.address.data,
@@ -336,9 +366,12 @@ def payment():
                            cardnum=form.cardNum.data,
                            expmonth=form.expmonth.data,
                            expyear=form.expyear.data,
-                           cvv=form.cvv.data)
+                           cvv=form.cvv.data,
+                           id=user.get_id(),
+                           rememberinfo=True)
             db.session.add(card)
             db.session.commit()
+            print("Yo")
             print('Payment successful')
             while True:
                 product = Cart.query.filter_by(cart_id=current_user.id).first()
@@ -348,6 +381,54 @@ def payment():
                     db.session.delete(product)
                     db.session.commit()
             return redirect(url_for('home'))
+
+        if form.validate_on_submit() and request.form.getlist('Remember_info') == []:
+            print("PATH 2 ")
+            exist_cardnum = db.session.query(Payment.cardnum).filter_by(cardnum=form.cardNum.data).first()
+            print(exist_cardnum)
+            if exist_cardnum:
+                print("PATH 2.1 ")
+                print('Payment successful')
+                while True:
+                    product = Cart.query.filter_by(cart_id=current_user.id).first()
+                    if product is None:
+                        break
+                    else:
+                        db.session.delete(product)
+                        db.session.commit()
+                return redirect(url_for('home'))
+
+            print("PATH 2.2 ")
+            card = Payment(name=form.name.data,
+                           email=form.email.data,
+                           address=form.address.data,
+                           country=form.country.data,
+                           city=form.city.data,
+                           zip=form.zip.data,
+                           cardname=form.cardName.data,
+                           cardnum=form.cardNum.data,
+                           expmonth=form.expmonth.data,
+                           expyear=form.expyear.data,
+                           cvv=form.cvv.data,
+                           id=user.get_id(),
+                           rememberinfo=False)
+            db.session.add(card)
+            db.session.commit()
+            print("Yo2")
+            print('Payment successful')
+            while True:
+                product = Cart.query.filter_by(cart_id=current_user.id).first()
+                if product is None:
+                    break
+                else:
+                    db.session.delete(product)
+                    db.session.commit()
+            return redirect(url_for('home'))
+
+        else:
+            return redirect(url_for('payment'))
+
+
     return render_template('payment.html', title='Payment', form=form, user=user)
 
 
