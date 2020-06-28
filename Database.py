@@ -101,34 +101,46 @@ def db_seed(database):
     database.session.add(toilet_paper_3py)
     database.session.add(toilet_paper_4py)
 
-    # john = User(
-    #     username='JohnDoe',
-    #     email='johnD@email.com',
-    #     password='abcd1234',
-    #     urole='Admin',
-    #     is_authenticated=False,
-    #     is_active=False)
-    #
-    # mary = User(
-    #     username='MaryJane',
-    #     email='maryJ@email.com',
-    #     password='abcd1234',
-    #     urole='customer',
-    #     is_authenticated=False,
-    #     is_active=False)
-    #
-    # peter = User(
-    #     username='Spidey',
-    #     email='pparker@email.com',
-    #     password='abcd1234',
-    #     urole='customer',
-    #     is_authenticated=False,
-    #     is_active=False)
+    admin = User(username='admin',
+                 email='admin@email.com',
+                 password='abcd1234',
+                 security_questions="Your's pet name",
+                 security_questions_answer='buddy',
+                 urole='admin',
+                 is_active=True,
+                 is_authenticated=False)
 
+    john = User(username='JohnDoe',
+                email='johnny@email.com',
+                password='abcd1234',
+                security_questions="Your's pet name",
+                security_questions_answer='buddy',
+                urole='customer',
+                is_active=True,
+                is_authenticated=False)
 
-    # database.session.add(john)
-    # database.session.add(mary)
-    # database.session.add(peter)
+    mary = User(username='MaryJane',
+                email='maryj@email.com',
+                password='abcd1234',
+                security_questions="Your's pet name",
+                security_questions_answer='buddy',
+                urole='customer',
+                is_active=True,
+                is_authenticated=False)
+
+    peter = User(username='Spidey',
+                 email='peterparker@email.com',
+                 password='abcd1234',
+                 security_questions="Your's pet name",
+                 security_questions_answer='buddy',
+                 urole='customer',
+                 is_active=True,
+                 is_authenticated=False)
+
+    database.session.add(admin)
+    database.session.add(john)
+    database.session.add(mary)
+    database.session.add(peter)
 
     database.session.commit()
     print('database seeded')
@@ -155,12 +167,13 @@ class User(db.Model):
     security_questions = Column(String(128))
     security_questions_answer = Column(String(128))
     is_authenticated = Column(Boolean, default=False)
-    is_anonymous = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
     urole = Column(String(80))
     user_reviews = relationship("Reviews")
+    cart = relationship("Cart")
 
-    def __init__(self, username, password, email, security_questions  ,security_questions_answer ,is_active, is_authenticated ,urole):
+    def __init__(self, username, password, email, security_questions, security_questions_answer, is_active,
+                 is_authenticated, urole):
         self.username = username
         self.password = password
         self.email = email
@@ -223,6 +236,14 @@ class Reviews(db.Model):
     review = Column(String)
 
 
+class Cart(db.Model):
+    __tablename__ = 'carts'
+    cart_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, primary_key=True)
+    quantity = Column(Integer)
+    id = Column(Integer, ForeignKey("users"))
+
+
 # to update the js file for the shop
 def update_js():
     statement = sql.text('SELECT * FROM products')
@@ -244,6 +265,8 @@ def update_js():
     print(data2)
 
     js = open("static/js/Shop.js", 'w')
-    js.write("function CreateList(){ var data = " + "{data}".format(data=data1) + ";return data}" + "function CreateReview(){var reviews = " + "{data}".format(data=data2) + "; return reviews}")
+    js.write("function CreateList(){ var data = " + "{data}".format(
+        data=data1) + ";return data}" + "function CreateReview(){var reviews = " + "{data}".format(
+        data=data2) + "; return reviews}")
     print('js updated')
     js.close()

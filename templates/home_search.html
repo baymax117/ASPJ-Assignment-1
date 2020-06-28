@@ -77,8 +77,8 @@ div#item-details > span{
 }
 
 textarea{
-    height:200px;
-    width:300px;
+    height:150px;
+    width:250px;
     resize: none;
 }
 </style>
@@ -120,14 +120,16 @@ textarea{
                 <hr>
                 <span>Description:</span>
                 <p id="item-desc"></p>
-                <button class="btn btn-primary add-cart">Add To Cart</button>
+                <form class="add-cart" method="post">
+                    <button class="btn btn-primary" type="submit">Add To Cart</button>
+                </form>
             </div>
             <div class="col">
                 <div class="row">
                     <h6>Reviews</h6>
                 </div>
                 <div class="row">
-                    {% autoescape false%}
+                    {% autoescape false %}
                     <textarea class="reviews" disabled></textarea>
                     {% endautoescape %}
                 </div>
