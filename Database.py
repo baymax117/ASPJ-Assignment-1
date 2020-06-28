@@ -101,34 +101,34 @@ def db_seed(database):
     database.session.add(toilet_paper_3py)
     database.session.add(toilet_paper_4py)
 
-    john = User(
-        username='JohnDoe',
-        email='johnD@email.com',
-        password='abcd1234',
-        urole='Admin',
-        is_authenticated=False,
-        is_active=False)
-
-    mary = User(
-        username='MaryJane',
-        email='maryJ@email.com',
-        password='abcd1234',
-        urole='customer',
-        is_authenticated=False,
-        is_active=False)
-
-    peter = User(
-        username='Spidey',
-        email='pparker@email.com',
-        password='abcd1234',
-        urole='customer',
-        is_authenticated=False,
-        is_active=False)
-
-
-    database.session.add(john)
-    database.session.add(mary)
-    database.session.add(peter)
+    # john = User(
+    #     username='JohnDoe',
+    #     email='johnD@email.com',
+    #     password='abcd1234',
+    #     urole='Admin',
+    #     is_authenticated=False,
+    #     is_active=False)
+    #
+    # mary = User(
+    #     username='MaryJane',
+    #     email='maryJ@email.com',
+    #     password='abcd1234',
+    #     urole='customer',
+    #     is_authenticated=False,
+    #     is_active=False)
+    #
+    # peter = User(
+    #     username='Spidey',
+    #     email='pparker@email.com',
+    #     password='abcd1234',
+    #     urole='customer',
+    #     is_authenticated=False,
+    #     is_active=False)
+    #
+    #
+    # database.session.add(john)
+    # database.session.add(mary)
+    # database.session.add(peter)
 
     database.session.commit()
     print('database seeded')
@@ -159,6 +159,7 @@ class User(db.Model):
     is_anonymous = Column(Boolean, default=False)
     urole = Column(String(80))
     user_reviews = relationship("Reviews")
+    cart = relationship("Cart")
 
     def __init__(self, username, password, email, security_questions  ,security_questions_answer ,is_active, is_authenticated ,urole):
         self.username = username
@@ -221,6 +222,14 @@ class Reviews(db.Model):
     product_id = Column(Integer, ForeignKey("products"))
     id = Column(Integer, ForeignKey("users"))
     review = Column(String)
+
+
+class Cart(db.Model):
+    __tablename__ = 'carts'
+    cart_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, primary_key=True)
+    quantity = Column(Integer)
+    id = Column(Integer, ForeignKey("users"))
 
 
 # to update the js file for the shop
