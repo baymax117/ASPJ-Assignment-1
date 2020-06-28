@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify
 from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm ,PaymentForm
-from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin, AnonymousUserMixin
+from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 from functools import wraps
 from sqlalchemy.sql import text
 from uuid import uuid4
@@ -37,10 +37,6 @@ db.app = app
 db.init_app(app)
 jwt = JWTManager(app)
 
-
-class Anonymous(AnonymousUserMixin):
-    def __init__(self):
-        self.username = 'Guest'
 
 
 login_manager = LoginManager(app)

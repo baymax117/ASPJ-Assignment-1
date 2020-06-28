@@ -127,7 +127,9 @@ textarea{
                     <h6>Reviews</h6>
                 </div>
                 <div class="row">
+                    {% autoescape false%}
                     <textarea class="reviews" disabled></textarea>
+                    {% endautoescape %}
                 </div>
                 <div class="row" style="margin-top:10%">
                     <h6>Enter a review</h6>
