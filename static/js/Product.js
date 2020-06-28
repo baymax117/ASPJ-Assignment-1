@@ -20,6 +20,7 @@ $(document).ready(function(){
                 $("#item-details").html('<span>' + data[product][1] + '</span><br><span>' + data[product][2] + '</span><br><span>Price: $' + data[product][3].toFixed(2) + "</span>");
                 $("#item-desc").text(data[product][4]);
                 $("#form-review").attr('action', '/api/Reviews/add/' + data[product][0]);
+                $(".add-cart").attr('action', '/api/Cart/add_cart/' + data[product][0]);
                 if (data[product][4] != null){
                     $("#item-image").attr('src', '../static/img/' + data[product][5]);
                 }
@@ -27,7 +28,6 @@ $(document).ready(function(){
                     $("#item-image").attr('src', '../static/img/None.png');
                 };
                 for (entry in reviews){
-                console.log(entry)
                     if (reviews[entry][0] == data[product][0]){
                         $(".reviews").html($(".reviews").html() + reviews[entry][1] + ": " + reviews[entry][2] + "\n")
                     };
@@ -42,6 +42,7 @@ $(document).ready(function(){
             $(".overlay").hide();
             $("#item-details").text('');
             $("#form-review").attr('action', '');
+            $(".add-cart").attr('action', '');
             $("#item-image").attr('src', '../static/img/None.png');
             $(".overlay-item").data('clicked', false)
             $(".reviews").html("");

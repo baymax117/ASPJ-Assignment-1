@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify
-from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm ,PaymentForm
+from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm, PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 from functools import wraps
 from sqlalchemy.sql import text
@@ -8,14 +8,12 @@ from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import os
-#from datetime import timedelta
+# from datetime import timedelta
 from api.Cart import cart_api
 from api.Reviews import review_api
 from api.User_infotest import user_infotest_api
 from api.Login_first import user_login_toinfotest_api
 from api.User_info_admin import user_info_admin_api
-
-
 
 app = Flask(__name__)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
@@ -23,8 +21,6 @@ app.register_blueprint(review_api, url_prefix='/api/Reviews')
 app.register_blueprint(user_infotest_api, url_prefix='/api/User_infotest')
 app.register_blueprint(user_info_admin_api, url_prefix='/api/user_info_admin')
 app.register_blueprint(user_login_toinfotest_api, url_prefix='/api/login_toinfotest')
-
-
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
@@ -37,8 +33,6 @@ db.app = app
 db.init_app(app)
 jwt = JWTManager(app)
 
-
-
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -48,24 +42,27 @@ login_manager.login_view = 'login'
 # login_manager.needs_refresh_message = (u"Session timedout, please re-login")
 # login_manager.needs_refresh_message_category = 'info'
 
-user_schema = UserSchema()  #expect 1 record back
-users_schema = UserSchema(many=True) #expect multiple record back
+user_schema = UserSchema()  # expect 1 record back
+users_schema = UserSchema(many=True)  # expect multiple record back
+
 
 def login_required(role):
     def wrapper(fn):
         @wraps(fn)
         def decorated_view(*args, **kwargs):
             if current_user.is_authenticated == False:
-              print("YO MAN")
-              # return login_manager.unauthorized()
-              return "Forbidden access", 402
+                print("YO MAN")
+                # return login_manager.unauthorized()
+                return "Forbidden access", 402
             print("Next option")
             if (current_user.urole != role):
                 print("YO MAN 2")
                 # return login_manager.unauthorized()
                 return "Forbidden access", 402
             return fn(*args, **kwargs)
+
         return decorated_view
+
     return wrapper
 
 
@@ -115,8 +112,6 @@ def search():
                 products.append([row[1], row[3], row[6]])
         length = len(products)
         return render_template('home_search.html', products=products, length=length, query=query, user=user)
-
-
 
 
 @app.route('/getallusersrecords', methods=['GET'])
@@ -170,13 +165,13 @@ def login():
                 login_user(user, remember=form.remember_me.data)
                 user.activate_is_authenticated()
                 print(user.is_authenticated)
-                print("hey",current_user.is_authenticated)
+                print("hey", current_user.is_authenticated)
                 db.session.add(user)
                 db.session.commit()
                 session['user'] = request.form['username']
                 print("Login sucessful")
 
-                return redirect(url_for('home', username=current_user.username))
+                return redirect(url_for('home'))
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
 
@@ -193,7 +188,7 @@ def logout():
         return redirect(url_for('login'))
 
     print("here 1", current_user == None)
-    print("here",current_user)
+    print("here", current_user)
     user = current_user
     print("id", user.id)
     # print("name",current_user.username)
@@ -208,7 +203,6 @@ def logout():
     # if Anonymous:
     #     return redirect(url_for('login'))
     # else:
-
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -239,6 +233,7 @@ def signup():
         return redirect(url_for('signup'))
     return render_template('sign up.html', title="Sign Up", form=form)
 
+
 @app.route('/forgotpassword', methods=['GET', 'POST'])
 def forgotpassword():
     if current_user.is_authenticated:
@@ -264,16 +259,21 @@ def forgotpassword():
         else:
             flash('Email does not exist')
             return redirect((url_for('forgotpassword')))
-        return render_template('forgot_password.html', title='Reset Password',form1=form1, form2=form2, security_questions=security_questions)
+        return render_template('forgot_password.html', title='Reset Password', form1=form1, form2=form2,
+                               security_questions=security_questions)
 
     return render_template('forgot_password.html', title='Reset Password', form1=form1)
 
 
-
-
 @app.route('/cart')
 def cart():
-    return render_template('cart.html')
+    if current_user is None:
+        user = None
+    else:
+        user = current_user
+    current_cart = Cart.query.filter_by(cart_id=current_user.id)
+
+    return render_template('cart.html', user=user)
 
 
 @app.route('/payment', methods=['GET', 'POST'])
@@ -311,7 +311,7 @@ def reset_database():
 
 
 # Uncomment this function to reset the database
-# reset_database()
+reset_database()
 
 
 if __name__ == "__main__":
