@@ -106,7 +106,7 @@ def db_seed(database):
                  password='abcd1234',
                  security_questions="Your's pet name",
                  security_questions_answer='buddy',
-                 urole='admin',
+                 is_admin=True,
                  is_active=True,
                  is_authenticated=False)
 
@@ -115,7 +115,6 @@ def db_seed(database):
                 password='abcd1234',
                 security_questions="Your's pet name",
                 security_questions_answer='buddy',
-                urole='customer',
                 is_active=True,
                 is_authenticated=False)
 
@@ -124,7 +123,6 @@ def db_seed(database):
                 password='abcd1234',
                 security_questions="Your's pet name",
                 security_questions_answer='buddy',
-                urole='customer',
                 is_active=True,
                 is_authenticated=False)
 
@@ -133,7 +131,6 @@ def db_seed(database):
                  password='abcd1234',
                  security_questions="Your's pet name",
                  security_questions_answer='buddy',
-                 urole='customer',
                  is_active=True,
                  is_authenticated=False)
 
@@ -169,12 +166,13 @@ class User(db.Model):
     is_authenticated = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
     is_anonymous = Column(Boolean, default=False)
-    urole = Column(String(80))
+    is_admin = Column(Boolean, default=False)
     user_reviews = relationship("Reviews")
     cart = relationship("Cart")
+    # order = relationship("Order")
 
     def __init__(self, username, password, email, security_questions, security_questions_answer, is_active,
-                 is_authenticated, urole):
+                 is_authenticated, is_admin=False):
         self.username = username
         self.password = password
         self.email = email
@@ -182,7 +180,7 @@ class User(db.Model):
         self.security_questions_answer = security_questions_answer
         self.is_active = is_active
         self.is_authenticated = is_authenticated
-        self.urole = urole
+        self.is_admin = is_admin
 
     def is_authenticate(self):
         return self.is_authenticated
@@ -196,7 +194,7 @@ class User(db.Model):
     def get_id(self):
         return self.id
 
-    def is_acive(self):
+    def get_is_active(self):
         return self.is_active
 
     def activate_user(self):
@@ -205,13 +203,13 @@ class User(db.Model):
     def get_username(self):
         return self.username
 
-    def get_urole(self):
-        return self.urole
+    def get_is_admin(self):
+        return self.is_admin
 
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'username', 'email', 'password', 'is_authenticated', 'is_active', 'urole')
+        fields = ('id', 'username', 'email', 'password', 'is_authenticated', 'is_active', 'is_admin')
 
 
 class Payment(db.Model):
@@ -244,6 +242,20 @@ class Cart(db.Model):
     quantity = Column(Integer)
     id = Column(Integer, ForeignKey("users"))
 
+
+# class Order(db.Model):
+#     __tablename__ = 'orders'
+#     order_id = Column(Integer, primary_key=True)
+#     card_num = Column(Integer, ForeignKey("cards"))
+#     id = Column(Integer, ForeignKey("users"))
+
+
+class OrderItems(db.Model):
+    __tablename__ = 'order_items'
+    datetime = Column(Integer, primary_key=True)
+    cart_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer)
+    quantity = Column(Integer)
 
 # to update the js file for the shop
 def update_js():

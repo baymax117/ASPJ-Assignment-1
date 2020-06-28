@@ -90,7 +90,7 @@ def dropsession():
 
 
 # -----------------------------------------------------------------------
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     cart_no = 0
@@ -227,7 +227,7 @@ def signup():
             newuser = User(username=form.username.data, email=form.email.data, password=form.password.data,
                            security_questions=form.security_questions.data,
                            security_questions_answer=form.security_questions_answer.data,
-                           urole='customer', is_active=True, is_authenticated=False)
+                           is_active=True, is_authenticated=False)
 
             # Role.create('customer')
             # newuser.roles.append(Role(name='customer', id=2))
@@ -271,6 +271,28 @@ def forgotpassword():
                                security_questions=security_questions)
 
     return render_template('forgot_password.html', title='Reset Password', form1=form1)
+
+
+@app.route('/profile', methods=['GET'])
+def profile():
+    user_id = request.args.get('user_id')
+    if user_id is None:
+        return redirect(url_for('/'))
+    else:
+        user = User.query.filter_by(id=user_id).first()
+        if user is None:
+            return redirect(url_for('home'))
+        else:
+            return render_template('profile.html', user=user)
+
+
+@app.route('/orders', methods=['GET'])
+def orders():
+    user_id = request.args.get('user_id')
+    order_id = request.args.get('order_id')
+    if user_id is None or order_id is None:
+        return redirect(url_for('/'))
+    return render_template('order.html')
 
 
 @app.route('/cart')
