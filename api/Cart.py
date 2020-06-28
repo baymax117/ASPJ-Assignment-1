@@ -9,7 +9,7 @@ cart_api = Blueprint('cart_api', __name__)
 @cart_api.route('/add_cart/<int:product_id>', methods=['POST', 'GET'])
 def add_cart(product_id):
     if request.method == 'POST':
-        statement = text("SELECT cart_id, product_id FROM cart")
+        statement = text("SELECT cart_id, product_id FROM carts")
         result = db.engine.execute(statement)
         existing = False
         for row in result:
@@ -27,6 +27,7 @@ def add_cart(product_id):
                             id=current_user.id)
             db.session.add(new_cart)
         db.session.commit()
+        print('added')
     return redirect(request.referrer)
 
 
@@ -42,7 +43,7 @@ def remove_cart(product_id):
 
 
 @cart_api.route('/clear_cart/<int:product_id>', methods=['POST', 'GET'])
-def clear_cart():
+def clear_cart(product_id):
     if request.method == 'POST':
         current_cart = Cart.query.filter_by(cart_id=current_user.id, product_id=product_id).first()
         db.session.delete(current_cart)
