@@ -73,15 +73,35 @@ def load_user(id):
 
 # Add  @login_required and state the specific role 'admin' to protect against anonymous users to view a function,
 # Put below @app.route, will prevent them from accessing this function
+@app.before_request
+def before_request():
+    g.user = None
+    if 'user' in session:
+        g.user = session['user']
+        # session.permant = True
+        # app.permanent_session_lifetime = timedelta(minutes=1)
 
 
+@app.route('/dropsession')
+def dropsession():
+    session.pop('user', None)
+    return redirect(url_for("home"))
+    # return render_template('home.html')
+
+
+# -----------------------------------------------------------------------
 @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def home():
+    cart_no = 0
     if current_user.is_anonymous:
         user = None
     else:
         user = current_user
+        statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
+        results = db.engine.execute(statement)
+        for row in results:
+            cart_no += 1
     statement = text('SELECT * FROM products')
     results = db.engine.execute(statement)
     products = []
@@ -89,15 +109,20 @@ def home():
     for row in results:
         products.append([row[1], row[3], row[6]])
     length = len(products)
-    return render_template('home.html', products=products, length=length, user=user)
+    return render_template('home.html', products=products, length=length, user=user, cart_no=cart_no)
 
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    cart_no = 0
     if current_user is None:
         user = None
     else:
         user = current_user
+        statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
+        results = db.engine.execute(statement)
+        for row in results:
+            cart_no += 1
     if request.args.get('q') == '':
         print('redirected')
         return redirect(url_for('home'))
@@ -111,7 +136,8 @@ def search():
             if query.lower() in row[1].lower():
                 products.append([row[1], row[3], row[6]])
         length = len(products)
-        return render_template('home_search.html', products=products, length=length, query=query, user=user)
+        return render_template('home_search.html', products=products, length=length, query=query, user=user,
+                               cart_no=cart_no)
 
 
 @app.route('/getallusersrecords', methods=['GET'])
@@ -131,24 +157,6 @@ def getallusersrecords():
 #     return redirect(url_for('home'))
 
 
-@app.before_request
-def before_request():
-    g.user = None
-
-    if 'user' in session:
-        g.user = session['user']
-        # session.permant = True
-        # app.permanent_session_lifetime = timedelta(minutes=1)
-
-
-@app.route('/dropsession')
-def dropsession():
-    session.pop('user', None)
-    return redirect(url_for("home"))
-    # return render_template('home.html')
-
-
-# -----------------------------------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     # if current_user.is_authenticated:
@@ -267,13 +275,24 @@ def forgotpassword():
 
 @app.route('/cart')
 def cart():
+    cart_no = 0
+    cart_list = []
+    total_price = 0
     if current_user is None:
         user = None
     else:
         user = current_user
-    current_cart = Cart.query.filter_by(cart_id=current_user.id)
-
-    return render_template('cart.html', user=user)
+        statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
+        results = db.engine.execute(statement)
+        for row in results:
+            cart_no += 1
+            product = Product.query.filter_by(product_id=row[1]).first()
+            price = row[2] * product.product_price
+            # [product_name, image, price, quantity]
+            cart_list.append([product.product_name, product.product_image, row[2], price, product.product_id])
+        for item in cart_list:
+            total_price += item[3]
+    return render_template('cart.html', user=user, cart_no=cart_no, cart_list=cart_list, total=total_price)
 
 
 @app.route('/payment', methods=['GET', 'POST'])
@@ -285,7 +304,27 @@ def payment():
     form = PaymentForm()
     if request.method == 'POST':
         if form.validate_on_submit():
+            card = Payment(name=form.name.data,
+                           email=form.email.data,
+                           address=form.address.data,
+                           country=form.country.data,
+                           city=form.city.data,
+                           zip=form.zip.data,
+                           cardname=form.cardName.data,
+                           cardnum=form.cardNum.data,
+                           expmonth=form.expmonth.data,
+                           expyear=form.expyear.data,
+                           cvv=form.cvv.data)
+            db.session.add(card)
+            db.session.commit()
             print('Payment successful')
+            while True:
+                product = Cart.query.filter_by(cart_id=current_user.id).first()
+                if product is None:
+                    break
+                else:
+                    db.session.delete(product)
+                    db.session.commit()
             return redirect(url_for('home'))
     return render_template('payment.html', title='Payment', form=form, user=user)
 
@@ -311,7 +350,7 @@ def reset_database():
 
 
 # Uncomment this function to reset the database
-reset_database()
+# reset_database()
 
 
 if __name__ == "__main__":

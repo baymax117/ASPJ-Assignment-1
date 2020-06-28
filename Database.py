@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, sql, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, sql, Boolean, ForeignKey, log
 from sqlalchemy.orm import relationship
 import json
 from flask_marshmallow import Marshmallow

@@ -53,7 +53,7 @@ class PaymentForm(FlaskForm):
     city = StringField('City', validators=[InputRequired(), Length(min=1, max=150)])
     zip = IntegerField('Zip', validators=[InputRequired(), NumberRange(min=100000, max=999999)])
     cardName = StringField('Name on card', validators=[InputRequired(), Length(min=1, max=150)])
-    cardNum = IntegerField('Credit card number', validators=[InputRequired(), NumberRange(max=9999)])
+    cardNum = IntegerField('Credit card number', validators=[InputRequired(), NumberRange(min=3000000000000000, max=6999999999999999)])
     expmonth = SelectField(label='Card Expiry', validators=[InputRequired()],
                            choices=[('January', '01'), ('February', '02'), ('March', '03'),
                                     ('April', '04'), ('May', '05'), ('June', '06'), ('July', '07'),

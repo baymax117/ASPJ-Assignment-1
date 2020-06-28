@@ -83,10 +83,7 @@
     </p>
     <p>
         {{ form.cardNum.label }} <br>
-        {{ form.cardNum(size=1, maxlength=4) }} -
-        {{ form.cardNum(size=1, maxlength=4) }} -
-        {{ form.cardNum(size=1, maxlength=4) }} -
-        {{ form.cardNum(size=1, maxlength=4) }} <br>
+        {{ form.cardNum(size=16, maxlength=16) }}
         {% for error in form.cardNum.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
