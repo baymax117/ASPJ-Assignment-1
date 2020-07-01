@@ -9,13 +9,13 @@ from __future__ import print_function
 
 try:
     import sys
-
+    import lib
     sys.dont_write_bytecode = True
 
     try:
         __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
     except ImportError:
-        sys.exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
+        exit()
 
     import bdb
     import distutils
