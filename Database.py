@@ -115,6 +115,7 @@ def db_seed(database):
                 password='abcd1234',
                 security_questions="Your's pet name",
                 security_questions_answer='buddy',
+                is_admin = False,
                 is_active=True,
                 is_authenticated=False)
 
@@ -123,6 +124,7 @@ def db_seed(database):
                 password='abcd1234',
                 security_questions="Your's pet name",
                 security_questions_answer='buddy',
+                is_admin = False,
                 is_active=True,
                 is_authenticated=False)
 
@@ -131,6 +133,7 @@ def db_seed(database):
                  password='abcd1234',
                  security_questions="Your's pet name",
                  security_questions_answer='buddy',
+                 is_admin = False,
                  is_active=True,
                  is_authenticated=False)
 
@@ -178,12 +181,12 @@ class User(db.Model):
     is_authenticated = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
     is_anonymous = Column(Boolean, default=False)
-    urole = Column(String(80))
+    admin = Column(Boolean, default=False)
     user_reviews = relationship("Reviews")
     cart = relationship("Cart")
 
     def __init__(self, username, password, email, security_questions, security_questions_answer, is_active,
-                 is_authenticated, urole):
+                 is_authenticated, admin):
         self.username = username
         self.password = password
         self.email = email
@@ -191,7 +194,7 @@ class User(db.Model):
         self.security_questions_answer = security_questions_answer
         self.is_active = is_active
         self.is_authenticated = is_authenticated
-        self.urole = urole
+        self.admin = admin
 
     def is_authenticate(self):
         return self.is_authenticated
@@ -211,8 +214,8 @@ class User(db.Model):
     def get_username(self):
         return self.username
 
-    def get_urole(self):
-        return self.urole
+    def get_admin(self):
+        return self.admin
 
 
 class UserSchema(ma.Schema):
