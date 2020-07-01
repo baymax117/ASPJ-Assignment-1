@@ -14,10 +14,12 @@ from api.Reviews import review_api
 from api.User_infotest import user_infotest_api
 from api.Login_first import user_login_toinfotest_api
 from api.User_info_admin import user_info_admin_api
+from api.update_profile import update_profile_api
 
 app = Flask(__name__)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
+app.register_blueprint(update_profile_api, url_prefix='/api/update_profile')
 app.register_blueprint(user_infotest_api, url_prefix='/api/User_infotest')
 app.register_blueprint(user_info_admin_api, url_prefix='/api/user_info_admin')
 app.register_blueprint(user_login_toinfotest_api, url_prefix='/api/login_toinfotest')
@@ -47,23 +49,29 @@ users_schema = UserSchema(many=True)  # expect multiple record back
 
 
 def login_required(role):
-    def wrapper(fn):
-        @wraps(fn)
-        def decorated_view(*args, **kwargs):
-            if not current_user.is_authenticated:
-                print("YO MAN")
-                # return login_manager.unauthorized()
-                return "Forbidden access", 402
-            print("Next option")
-            if current_user.urole != role:
-                print("YO MAN 2")
-                # return login_manager.unauthorized()
-                return "Forbidden access", 402
-            return fn(*args, **kwargs)
+    @wraps(role)
+    def wrap(*args, **kwargs):
+        try:
+            if 'logged_in' in session:
+                return role(*args, **kwargs)
 
-        return decorated_view
+            else:
+                return redirect(url_for('home'))
+        except AttributeError:
+            print('You need to log in')
+            return redirect(url_for('login'))
+    return wrap
 
-    return wrapper
+
+def admin_required(yeet):
+    @wraps(yeet)
+    def wrap(*args, **kwargs):
+        if current_user.admin:
+            return yeet(*args, **kwargs)
+        else:
+            print('You need to be an Admin')
+            return redirect(url_for('home'))
+    return wrap
 
 
 @login_manager.user_loader
@@ -433,9 +441,17 @@ def payment():
 
 
 @app.route('/admin_test', methods=['GET', 'POST'])
-# @login_required('admin')
+@login_required
+@admin_required
 def admin_test():
     return render_template('admin_page.html', user=current_user), 200
+
+
+@app.route('/update_profile', methods=['GET', 'POST'])
+@login_required
+def update_profile():
+
+    return render_template('update_profile.html', user=current_user)
 
 
 def reset_database():
@@ -453,8 +469,8 @@ def reset_database():
 
 
 # Uncomment this function to reset the database
-reset_database()
+# reset_database()
 
 
-# if __name__ == "__main__":
-#     app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)

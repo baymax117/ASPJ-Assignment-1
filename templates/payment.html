@@ -91,11 +91,6 @@
     <p>
         {{ form.expmonth.label }} <br>
         {{ form.expmonth(size=1) }}
-        {{ form.expmonth() }} <br>
-
-        {% for error in form.expmonth.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
         /
         {{ form.expyear(size=1) }} <br>
         {% for error in form.expyear.errors %}

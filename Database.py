@@ -106,7 +106,7 @@ def db_seed(database):
                  password='abcd1234',
                  security_questions="Your's pet name",
                  security_questions_answer='buddy',
-                 urole='admin',
+                 is_admin=True,
                  is_active=True,
                  is_authenticated=False)
 
@@ -115,7 +115,7 @@ def db_seed(database):
                 password='abcd1234',
                 security_questions="Your's pet name",
                 security_questions_answer='buddy',
-                urole='customer',
+                is_admin = False,
                 is_active=True,
                 is_authenticated=False)
 
@@ -124,7 +124,7 @@ def db_seed(database):
                 password='abcd1234',
                 security_questions="Your's pet name",
                 security_questions_answer='buddy',
-                urole='customer',
+                is_admin = False,
                 is_active=True,
                 is_authenticated=False)
 
@@ -133,7 +133,7 @@ def db_seed(database):
                  password='abcd1234',
                  security_questions="Your's pet name",
                  security_questions_answer='buddy',
-                 urole='customer',
+                 is_admin = False,
                  is_active=True,
                  is_authenticated=False)
 
@@ -169,12 +169,12 @@ class User(db.Model):
     is_authenticated = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
     is_anonymous = Column(Boolean, default=False)
-    urole = Column(String(80))
+    is_admin = Column(Boolean, default=False)
     user_reviews = relationship("Reviews")
     cart = relationship("Cart")
 
     def __init__(self, username, password, email, security_questions, security_questions_answer, is_active,
-                 is_authenticated, urole):
+                 is_authenticated, is_admin):
         self.username = username
         self.password = password
         self.email = email
@@ -182,7 +182,7 @@ class User(db.Model):
         self.security_questions_answer = security_questions_answer
         self.is_active = is_active
         self.is_authenticated = is_authenticated
-        self.urole = urole
+        self.is_admin = is_admin
 
     def is_authenticate(self):
         return self.is_authenticated
@@ -202,8 +202,8 @@ class User(db.Model):
     def get_username(self):
         return self.username
 
-    def get_urole(self):
-        return self.urole
+    def get_admin(self):
+        return self.is_admin
 
 
 class UserSchema(ma.Schema):
@@ -259,7 +259,7 @@ class OrderItems(db.Model):
     quantity = Column(Integer)
 
 # to update the js file for the shop
-def update_js(route="static/js/Shop.js"):
+def update_js():
     statement = sql.text('SELECT * FROM products')
     result = db.engine.execute(statement)
     data = []
@@ -278,7 +278,7 @@ def update_js(route="static/js/Shop.js"):
     data2 = json.dumps(data)
     print(data2)
 
-    js = open(route, 'w')
+    js = open("static/js/Shop.js", 'w')
     js.write("function CreateList(){ var data = " + "{data}".format(
         data=data1) + ";return data}" + "function CreateReview(){var reviews = " + "{data}".format(
         data=data2) + "; return reviews}")

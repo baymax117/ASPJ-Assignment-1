@@ -23,7 +23,6 @@ class CreateUserForm(FlaskForm):
                                               ('Your favourite food','Your favourite food')])
     security_questions_answer = StringField('Your secret answer', validators=[InputRequired()])
 
-
     # confirmPassword = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password')])
     # submit = SubmitField('Sign up!')
 

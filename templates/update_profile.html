@@ -1,0 +1,39 @@
+{% from "includes/_formHelper.html" import render_field %}
+{% block title %}CB Shop - Update Profile{% endblock %}
+
+{% block content %}
+<style>
+    h1, form {
+        margin-left: 100px;
+        margin-top: 50px;
+    }
+
+    button {
+        background-color: light grey;
+        border-radius: 8px;
+        left: 600px;
+        position: absolute;
+    }
+
+    form {
+        padding-bottom: 100px;
+    }
+</style>
+
+<h1>
+    Update Profile
+</h1>
+
+<form name="update_form" method="POST" action="/api/update_profile/update/{{ user.username }}">
+    <h3>
+        Enter new username
+    </h3>
+    <input name="update_username">
+    <h3>
+        Enter new password
+    </h3>
+    <input name="update_password">
+    <button type="submit">Confirm Change</button>
+</form>
+
+{% endblock %}
