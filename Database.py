@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, sql, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, sql, Boolean, ForeignKey, log
 from sqlalchemy.orm import relationship
 import json
 from flask_marshmallow import Marshmallow
@@ -106,7 +106,7 @@ def db_seed(database):
                  password='abcd1234',
                  security_questions="Your's pet name",
                  security_questions_answer='buddy',
-                 admin = True,
+                 is_admin=True,
                  is_active=True,
                  is_authenticated=False)
 
@@ -115,7 +115,7 @@ def db_seed(database):
                 password='abcd1234',
                 security_questions="Your's pet name",
                 security_questions_answer='buddy',
-                admin = False,
+                is_admin = False,
                 is_active=True,
                 is_authenticated=False)
 
@@ -124,7 +124,7 @@ def db_seed(database):
                 password='abcd1234',
                 security_questions="Your's pet name",
                 security_questions_answer='buddy',
-                admin = False,
+                is_admin = False,
                 is_active=True,
                 is_authenticated=False)
 
@@ -133,7 +133,7 @@ def db_seed(database):
                  password='abcd1234',
                  security_questions="Your's pet name",
                  security_questions_answer='buddy',
-                 admin = False,
+                 is_admin = False,
                  is_active=True,
                  is_authenticated=False)
 
@@ -144,6 +144,18 @@ def db_seed(database):
 
     database.session.commit()
     print('database seeded')
+
+
+class Product(db.Model):
+    __tablename__ = 'products'
+    product_id = Column(Integer, primary_key=True)
+    product_name = Column(String)
+    product_type = Column(String)
+    product_price = Column(Float)
+    product_description = Column(String)
+    product_stock = Column(Integer)
+    product_image = Column(String)
+    product_reviews = relationship("Reviews")
 
 
 class Product(db.Model):
@@ -196,9 +208,6 @@ class User(db.Model):
     def get_id(self):
         return self.id
 
-    def is_acive(self):
-        return self.is_active
-
     def activate_user(self):
         self.is_active = True
 
@@ -217,7 +226,7 @@ class UserSchema(ma.Schema):
 class Payment(db.Model):
     __tablename__ = 'cards'
     name = Column(String(150))
-    email = Column(String(120), unique=True)
+    email = Column(String(120))
     address = Column(String(150))
     country = Column(String(56))
     city = Column(String(150))
@@ -227,6 +236,8 @@ class Payment(db.Model):
     expmonth = Column(String(9))
     expyear = Column(Integer)
     cvv = Column(Integer)
+    id = Column(Integer, ForeignKey('users'))
+    rememberinfo = Column(Boolean, default=False)
 
 
 class Reviews(db.Model):
@@ -244,6 +255,20 @@ class Cart(db.Model):
     quantity = Column(Integer)
     id = Column(Integer, ForeignKey("users"))
 
+
+# class Order(db.Model):
+#     __tablename__ = 'orders'
+#     order_id = Column(Integer, primary_key=True)
+#     card_num = Column(Integer, ForeignKey("cards"))
+#     id = Column(Integer, ForeignKey("users"))
+
+
+class OrderItems(db.Model):
+    __tablename__ = 'order_items'
+    datetime = Column(Integer, primary_key=True)
+    cart_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer)
+    quantity = Column(Integer)
 
 # to update the js file for the shop
 def update_js():

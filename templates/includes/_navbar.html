@@ -17,17 +17,14 @@
               <a class="nav-link" href="/login">Login</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/payment">Payment</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href='/signup'>Sign Up</a>
             </li>
             {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="/">Cart</a>
+              <a class="nav-link" href="/cart">Cart ({{ cart_no }})</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link">{% autoescape false %}{{ user.username }}{% endautoescape %}</a>
+                <a class="nav-link" href="{{ url_for('profile', user_id=user.id)}}">{% autoescape false %}{{ user.username }}{% endautoescape %}</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Sign out</a>

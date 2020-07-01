@@ -1,6 +1,48 @@
 {% extends "base.html" %}
 {% block title %}CB Shop - Cart{% endblock %}
 
+{% block style %}
+<style>
+    img{
+        height: 100px;
+        width: 100px;
+    }
+</style>
+{% endblock %}
 {% block content %}
-
+<h2>Your Cart</h2>
+{% if cart_no == 0 %}
+<p>Your cart is empty</p>
+{% else %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Image</th>
+                <th colspan="3">Quantity</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in cart_list %}
+            <tr>
+                <td>{{ item[0] }}</td>
+                <td><img src="../static/img/{{ item[1] }}"></td>
+                <td><form action="/api/Cart/remove_cart/{{ item[4] }}" method="post"><button type="submit">-</button></form></td>
+                <td>{{ item[2] }}</td>
+                <td><form action="/api/Cart/add_cart/{{ item[4] }}" method="post"><button type="submit">+</button></form></td>
+                <td>${{ "{:.2f}".format(item[3]) }}</td>
+            </tr>
+        {% endfor %}
+            <tr>
+                <th colspan="5">Total Price</th>
+                <td>${{ "{:.2f}".format(total) }}</td>
+            </tr>
+            <tr>
+                <th colspan="5"></th>
+                <td><button onclick="location.href = '/payment'">Checkout</button></td>
+            </tr>
+        </tbody>
+    </table>
+{% endif %}
 {% endblock %}
