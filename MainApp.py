@@ -66,7 +66,7 @@ def login_required(role):
 def admin_required(yeet):
     @wraps(yeet)
     def wrap(*args, **kwargs):
-        if current_user.admin:
+        if current_user.is_admin:
             return yeet(*args, **kwargs)
         else:
             print('You need to be an Admin')

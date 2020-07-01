@@ -23,9 +23,9 @@ def update(username):
 
         if new_admin is not None:
             if new_admin == 'True':
-                user.admin = True
+                user.is_admin = True
             else:
-                user.admin = False
+                user.is_admin = False
 
         db.session.commit()
         return 'Works'
