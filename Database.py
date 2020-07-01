@@ -106,7 +106,7 @@ def db_seed(database):
                  password='abcd1234',
                  security_questions="Your's pet name",
                  security_questions_answer='buddy',
-                 is_admin=True,
+                 urole='admin',
                  is_active=True,
                  is_authenticated=False)
 
@@ -115,6 +115,7 @@ def db_seed(database):
                 password='abcd1234',
                 security_questions="Your's pet name",
                 security_questions_answer='buddy',
+                urole='customer',
                 is_active=True,
                 is_authenticated=False)
 
@@ -123,6 +124,7 @@ def db_seed(database):
                 password='abcd1234',
                 security_questions="Your's pet name",
                 security_questions_answer='buddy',
+                urole='customer',
                 is_active=True,
                 is_authenticated=False)
 
@@ -131,6 +133,7 @@ def db_seed(database):
                  password='abcd1234',
                  security_questions="Your's pet name",
                  security_questions_answer='buddy',
+                 urole='customer',
                  is_active=True,
                  is_authenticated=False)
 
@@ -141,18 +144,6 @@ def db_seed(database):
 
     database.session.commit()
     print('database seeded')
-
-
-class Product(db.Model):
-    __tablename__ = 'products'
-    product_id = Column(Integer, primary_key=True)
-    product_name = Column(String)
-    product_type = Column(String)
-    product_price = Column(Float)
-    product_description = Column(String)
-    product_stock = Column(Integer)
-    product_image = Column(String)
-    product_reviews = relationship("Reviews")
 
 
 class Product(db.Model):
@@ -268,7 +259,7 @@ class OrderItems(db.Model):
     quantity = Column(Integer)
 
 # to update the js file for the shop
-def update_js():
+def update_js(route="static/js/Shop.js"):
     statement = sql.text('SELECT * FROM products')
     result = db.engine.execute(statement)
     data = []
@@ -287,7 +278,7 @@ def update_js():
     data2 = json.dumps(data)
     print(data2)
 
-    js = open("static/js/Shop.js", 'w')
+    js = open(route, 'w')
     js.write("function CreateList(){ var data = " + "{data}".format(
         data=data1) + ";return data}" + "function CreateReview(){var reviews = " + "{data}".format(
         data=data2) + "; return reviews}")

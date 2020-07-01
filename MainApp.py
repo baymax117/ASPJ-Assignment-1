@@ -50,12 +50,12 @@ def login_required(role):
     def wrapper(fn):
         @wraps(fn)
         def decorated_view(*args, **kwargs):
-            if current_user.is_authenticated == False:
+            if not current_user.is_authenticated:
                 print("YO MAN")
                 # return login_manager.unauthorized()
                 return "Forbidden access", 402
             print("Next option")
-            if (current_user.urole != role):
+            if current_user.urole != role:
                 print("YO MAN 2")
                 # return login_manager.unauthorized()
                 return "Forbidden access", 402
@@ -433,9 +433,9 @@ def payment():
 
 
 @app.route('/admin_test', methods=['GET', 'POST'])
-@login_required('admin')
+# @login_required('admin')
 def admin_test():
-    return render_template('admin_page.html'), 200
+    return render_template('admin_page.html', user=current_user), 200
 
 
 def reset_database():
@@ -453,8 +453,8 @@ def reset_database():
 
 
 # Uncomment this function to reset the database
-# reset_database()
+reset_database()
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run(debug=True)
