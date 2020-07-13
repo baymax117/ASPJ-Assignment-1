@@ -16,9 +16,7 @@ Name = "Robert'; DROP TABLE students;--"
 Name_to_use = (Name,)
 print("Name to use:", Name_to_use)
 
-Name
-to
-use: ("Robert'; DROP TABLE students;--",)
+Name_to_use: ("Robert'; DROP TABLE students;--",)
 c.execute("SELECT * from students WHERE Name=(?)" , Name_to_use)
 data = [("Robert'; DROP TABLE students;--", 10)]
 c.executemany("INSERT INTO students VALUES (?,?)", data)

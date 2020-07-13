@@ -106,10 +106,13 @@ def home():
         user = None
     else:
         user = current_user
-        statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
-        results = db.engine.execute(statement)
-        for row in results:
-            cart_no += 1
+        if current_user.is_anonymous:
+            cart_no = None
+        else:
+            statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
+            results = db.engine.execute(statement)
+            for row in results:
+                cart_no += 1
     statement = text('SELECT * FROM products')
     results = db.engine.execute(statement)
     products = []
@@ -127,10 +130,13 @@ def search():
         user = None
     else:
         user = current_user
-        statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
-        results = db.engine.execute(statement)
-        for row in results:
-            cart_no += 1
+        if current_user.is_anonymous:
+            cart_no = None
+        else:
+            statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
+            results = db.engine.execute(statement)
+            for row in results:
+                cart_no += 1
     if request.args.get('q') == '':
         print('redirected')
         return redirect(url_for('home'))
@@ -234,7 +240,7 @@ def signup():
             # hashed_password = generate_password_hash(form.password.data, method='sha256')
             newuser = User(username=form.username.data, email=form.email.data, password=form.password.data,
                            security_questions=form.security_questions.data,
-                           security_questions_answer=form.security_questions_answer.data,
+                           security_questions_answer=form.security_questions_answer.data, is_admin=False,
                            is_active=True, is_authenticated=False)
 
             # Role.create('customer')
