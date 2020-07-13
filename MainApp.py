@@ -192,6 +192,7 @@ def login():
                 db.session.commit()
                 session['user'] = request.form['username']
                 print("Login sucessful")
+                session['logged_in'] = True
 
                 return redirect(url_for('home'))
         flash("Invalid username or password, please try again!")
