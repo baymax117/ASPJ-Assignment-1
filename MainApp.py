@@ -66,7 +66,7 @@ def login_required(role):
 def admin_required(yeet):
     @wraps(yeet)
     def wrap(*args, **kwargs):
-        if current_user.admin:
+        if current_user.is_admin:
             return yeet(*args, **kwargs)
         else:
             print('You need to be an Admin')
@@ -186,7 +186,6 @@ def login():
                 db.session.commit()
                 session['user'] = request.form['username']
                 print("Login sucessful")
-                session['logged_in'] = True
 
                 return redirect(url_for('home'))
         flash("Invalid username or password, please try again!")
@@ -235,13 +234,12 @@ def signup():
             # hashed_password = generate_password_hash(form.password.data, method='sha256')
             newuser = User(username=form.username.data, email=form.email.data, password=form.password.data,
                            security_questions=form.security_questions.data,
-                           security_questions_answer=form.security_questions_answer.data, is_admin=False,
+                           security_questions_answer=form.security_questions_answer.data,
                            is_active=True, is_authenticated=False)
 
             # Role.create('customer')
             # newuser.roles.append(Role(name='customer', id=2))
             # newuser.set_password(form.password.data)
-            print(request.form)
             db.session.add(newuser)
             db.session.commit()
             flash("You have successfully signed up!")
@@ -446,7 +444,7 @@ def payment():
 @login_required
 @admin_required
 def admin_test():
-    return render_template('admin_page.html'), 200
+    return render_template('admin_page.html', user=current_user), 200
 
 
 @app.route('/update_profile', methods=['GET', 'POST'])

