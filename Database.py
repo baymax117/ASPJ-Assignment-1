@@ -1,11 +1,17 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, sql, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, sql, Boolean, ForeignKey, log , Unicode
 from sqlalchemy.orm import relationship
 import json
 from flask_marshmallow import Marshmallow
+#---New---
+
+#---New---
+
+
 
 db = SQLAlchemy()
 ma = Marshmallow()
+key = b'pRmgMa8T0INjEAfksaq2aafzoZXEuwKI7wDe4c1F8AY='
 
 
 def db_create(database):
@@ -101,7 +107,8 @@ def db_seed(database):
     database.session.add(toilet_paper_3py)
     database.session.add(toilet_paper_4py)
 
-    admin = User(username='admin',
+    admin = User(public_id='abcd',
+                 username='admin',
                  email='admin@email.com',
                  password='abcd1234',
                  security_questions="Your's pet name",
@@ -110,7 +117,8 @@ def db_seed(database):
                  is_active=True,
                  is_authenticated=False)
 
-    john = User(username='JohnDoe',
+    john = User(public_id='abcde',
+                username='JohnDoe',
                 email='johnny@email.com',
                 password='abcd1234',
                 security_questions="Your's pet name",
@@ -119,7 +127,8 @@ def db_seed(database):
                 is_active=True,
                 is_authenticated=False)
 
-    mary = User(username='MaryJane',
+    mary = User(public_id='abcdef',
+                username='MaryJane',
                 email='maryj@email.com',
                 password='abcd1234',
                 security_questions="Your's pet name",
@@ -128,7 +137,8 @@ def db_seed(database):
                 is_active=True,
                 is_authenticated=False)
 
-    peter = User(username='Spidey',
+    peter = User(public_id='abcdefg',
+                 username='Spidey',
                  email='peterparker@email.com',
                  password='abcd1234',
                  security_questions="Your's pet name",
@@ -161,7 +171,10 @@ class Product(db.Model):
 class User(db.Model):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    username = Column(String(64))
+    public_id = Column(String(50), unique=True)
+    # username = Column(EncryptedType(Unicode, key, AesEngine, 'pkcs5' ))
+    # username =  Column(EncryptedType(String, key), nullable=True)
+    username = Column(String(100))
     email = Column(String(120), index=True, unique=True)
     password = Column(String(128))
     security_questions = Column(String(128))
@@ -173,8 +186,9 @@ class User(db.Model):
     user_reviews = relationship("Reviews")
     cart = relationship("Cart")
 
-    def __init__(self, username, password, email, security_questions, security_questions_answer, is_active,
+    def __init__(self, public_id ,username, password, email, security_questions, security_questions_answer, is_active,
                  is_authenticated, is_admin):
+        self.public_id = public_id
         self.username = username
         self.password = password
         self.email = email
@@ -183,6 +197,19 @@ class User(db.Model):
         self.is_active = is_active
         self.is_authenticated = is_authenticated
         self.is_admin = is_admin
+
+    # def decrypt_username(self, username_input, database_input):
+    #     cipher_suite = Fernet(key)
+    #     result = cipher_suite.decrypt(database_input, ttl=None).decode("utf-8")
+    #     if result == username_input:
+    #         return True
+    #     else:
+    #         return False
+    # def encrypt_username(self, username_input):
+    #     cipher_suite = Fernet(key)
+    #     result = cipher_suite.encrypt(bytes(username_input, 'utf-8'))
+    #     # return result.decode("utf-8")
+    #     return result
 
     def is_authenticate(self):
         return self.is_authenticated
@@ -220,12 +247,12 @@ class Payment(db.Model):
     city = Column(String(150))
     zip = Column(Integer)
     cardname = Column(String(150))
-    cardnum = Column(Integer, primary_key=True)
+    cardnum = Column(String(150), primary_key=True) #change to string
     expmonth = Column(String(9))
     expyear = Column(Integer)
     cvv = Column(Integer)
     id = Column(Integer, ForeignKey('users'))
-    rememberinfo = Column(Boolean, default=False)
+    # rememberinfo = Column(Boolean, default=False)
 
 
 class Reviews(db.Model):
