@@ -384,9 +384,26 @@ def signup():
         # --Plaintext---
 
         # --sha512---
+        # email
         hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
-        exists = db.session.query(User.id).filter_by(email=hashed_email_data).scalar()
-        exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
+        exists = False
+        statement = text("SELECT * FROM users WHERE email = '{}'".format(hashed_email_data))
+        results = db.engine.execute(statement)
+        count = 0
+        for row in results:
+            count += 1
+        if count >= 1:
+            exists = True
+
+        # check username
+        exists2 = False
+        statement = text("SELECT * FROM users WHERE username = '{}'".format(form.username.data))
+        results = db.engine.execute(statement)
+        count = 0
+        for row in results:
+            count += 1
+        if count >= 1:
+            exists2 = True
         # --sha512---
 
         # bcrypt
@@ -395,7 +412,7 @@ def signup():
         # exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
         # bcrypt
 
-        if exists is None and exists2 is None:
+        if not exists and not exists2:
             # ---sha algorithm----
             # hashed_password = generate_password_hash(form.password.data, method='sha512') #with salt
             # hashed_security_Q = generate_password_hash(form.security_questions.data, method='sha1') #with salt
@@ -427,7 +444,10 @@ def signup():
             flash("You have successfully signed up!")
             return redirect(url_for('login'))
 
-        flash("Email exists!!")
+        if exists:
+            flash("Email exists!")
+        if exists2:
+            flash("Username is taken!")
         return redirect(url_for('signup'))
     return render_template('sign up.html', title="Sign Up", form=form)
 
