@@ -215,43 +215,6 @@ def test_info(current_user, public_id):
 
 
 # ------------------ZY's API---------------------
-
-
-def login_required(role):
-    @wraps(role)
-    def wrap(*args, **kwargs):
-        try:
-            if 'logged_in' in session:
-                return role(*args, **kwargs)
-
-            else:
-                return redirect(url_for('home'))
-        except AttributeError:
-            print('You need to log in')
-            return redirect(url_for('login'))
-
-    return wrap
-
-
-def admin_required(yeet):
-    @wraps(yeet)
-    def wrap(*args, **kwargs):
-        if current_user.is_admin:
-            return yeet(*args, **kwargs)
-        else:
-            print('You need to be an Admin')
-            return redirect(url_for('home'))
-
-    return wrap
-
-
-@login_manager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
-
-
-# Add  @login_required and state the specific role 'admin' to protect against anonymous users to view a function,
-# Put below @app.route, will prevent them from accessing this function
 @app.before_request
 def before_request():
     g.user = None
@@ -269,6 +232,11 @@ def dropsession():
 
 
 # -----------------------------------------------------------------------
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
@@ -416,9 +384,26 @@ def signup():
         # --Plaintext---
 
         # --sha512---
+        # email
         hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
-        exists = db.session.query(User.id).filter_by(email=hashed_email_data).scalar()
-        exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
+        exists = False
+        statement = text("SELECT * FROM users WHERE email = '{}'".format(hashed_email_data))
+        results = db.engine.execute(statement)
+        count = 0
+        for row in results:
+            count += 1
+        if count >= 1:
+            exists = True
+
+        # check username
+        exists2 = False
+        statement = text("SELECT * FROM users WHERE username = '{}'".format(form.username.data))
+        results = db.engine.execute(statement)
+        count = 0
+        for row in results:
+            count += 1
+        if count >= 1:
+            exists2 = True
         # --sha512---
 
         # bcrypt
@@ -427,7 +412,7 @@ def signup():
         # exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
         # bcrypt
 
-        if exists is None and exists2 is None:
+        if not exists and not exists2:
             # ---sha algorithm----
             # hashed_password = generate_password_hash(form.password.data, method='sha512') #with salt
             # hashed_security_Q = generate_password_hash(form.security_questions.data, method='sha1') #with salt
@@ -459,7 +444,10 @@ def signup():
             flash("You have successfully signed up!")
             return redirect(url_for('login'))
 
-        flash("Email exists!!")
+        if exists:
+            flash("Email exists!")
+        if exists2:
+            flash("Username is taken!")
         return redirect(url_for('signup'))
     return render_template('sign up.html', title="Sign Up", form=form)
 
@@ -582,7 +570,7 @@ def cart():
 
 @app.route('/payment', methods=['GET', 'POST'])
 def payment():
-    if current_user is None:
+    if current_user.is_anonymous:
         user = None
     else:
         user = current_user
@@ -790,16 +778,22 @@ def payment():
 
 
 @app.route('/admin_test', methods=['GET', 'POST'])
-@login_required
-@admin_required
 def admin_test():
-    return render_template('admin_page.html', user=current_user), 200
+    if current_user.is_admin:
+        return render_template('admin_page.html', user=current_user), 200
+    else:
+        return redirect(url_for("home"))
 
 
 @app.route('/update_profile', methods=['GET', 'POST'])
-@login_required
 def update_profile():
-    return render_template('update_profile.html', user=current_user)
+    invalid = False
+    if request.referrer.endswith('update_profile'):
+        invalid = True
+    if current_user.is_anonymous:
+        return redirect(url_for("home"))
+    else:
+        return render_template('update_profile.html', user=current_user, error=invalid)
 
 
 def reset_database():
