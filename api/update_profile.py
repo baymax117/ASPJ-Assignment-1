@@ -21,11 +21,5 @@ def update(username):
         if new_password is not None:
             user.password = new_password
 
-        if new_admin is not None:
-            if new_admin == 'True':
-                user.is_admin = True
-            else:
-                user.is_admin = False
-
         db.session.commit()
         return 'Works'

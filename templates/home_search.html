@@ -86,9 +86,7 @@ textarea{
 
 
 {% block content %}
-{% autoescape false%}
 <div>Search Result for {{ query }}</div>
-{% endautoescape %}
 {% for i in range(length) %}
     <div class="col col-2 item-container" id="{{ products[i][0] }}">
         {% if products[i][2] is none %}
@@ -129,9 +127,7 @@ textarea{
                     <h6>Reviews</h6>
                 </div>
                 <div class="row">
-                    {% autoescape false %}
                     <textarea class="reviews" disabled></textarea>
-                    {% endautoescape %}
                 </div>
                 <div class="row" style="margin-top:10%">
                     <h6>Enter a review</h6>
