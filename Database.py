@@ -107,51 +107,6 @@ def db_seed(database):
     database.session.add(toilet_paper_3py)
     database.session.add(toilet_paper_4py)
 
-    admin = User(public_id='abcd',
-                 username='admin',
-                 email='admin@email.com',
-                 password='abcd1234',
-                 security_questions="Your's pet name",
-                 security_questions_answer='buddy',
-                 is_admin=True,
-                 is_active=True,
-                 is_authenticated=False)
-
-    john = User(public_id='abcde',
-                username='JohnDoe',
-                email='johnny@email.com',
-                password='abcd1234',
-                security_questions="Your's pet name",
-                security_questions_answer='buddy',
-                is_admin = False,
-                is_active=True,
-                is_authenticated=False)
-
-    mary = User(public_id='abcdef',
-                username='MaryJane',
-                email='maryj@email.com',
-                password='abcd1234',
-                security_questions="Your's pet name",
-                security_questions_answer='buddy',
-                is_admin = False,
-                is_active=True,
-                is_authenticated=False)
-
-    peter = User(public_id='abcdefg',
-                 username='Spidey',
-                 email='peterparker@email.com',
-                 password='abcd1234',
-                 security_questions="Your's pet name",
-                 security_questions_answer='buddy',
-                 is_admin = False,
-                 is_active=True,
-                 is_authenticated=False)
-
-    database.session.add(admin)
-    database.session.add(john)
-    database.session.add(mary)
-    database.session.add(peter)
-
     database.session.commit()
     print('database seeded')
 

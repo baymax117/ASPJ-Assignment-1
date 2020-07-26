@@ -20,19 +20,20 @@
     }
 </style>
 
+{% if error %}
+<script>
+    alert("Invalid Username!")
+</script>
+{% endif %}
 <h1>
     Update Profile
 </h1>
 
-<form name="update_form" method="POST" action="/api/update_profile/update/{{ user.username }}">
+<form name="update_form" method="POST" action="/api/update_profile/update">
     <h3>
         Enter new username
     </h3>
     <input name="update_username">
-    <h3>
-        Enter new password
-    </h3>
-    <input name="update_password">
     <button type="submit">Confirm Change</button>
 </form>
 

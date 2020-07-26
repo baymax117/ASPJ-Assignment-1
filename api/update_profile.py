@@ -7,19 +7,24 @@ from Database import db, update_js
 update_profile_api = Blueprint('update_profile_api', __name__)
 
 
-@update_profile_api.route('/update/<username>', methods=['GET', 'POST'])
-def update(username):
+@update_profile_api.route('/update', methods=['GET', 'POST'])
+def update():
     if request.method == 'POST':
         new_username = request.form.get('update_username')
-        new_password = request.form.get('update_password')
-        new_admin = request.form.get('admin')
-        print(new_admin)
-        user = User.query.filter_by(username=username).first()
-        if new_username is not None:
-            user.username = new_username
-
-        if new_password is not None:
-            user.password = new_password
-
-        db.session.commit()
-        return 'Works'
+        user = User.query.filter_by(public_id=current_user.public_id).first()
+        count = 0
+        statement = text("SELECT * FROM users WHERE username = '{}'".format(new_username))
+        results = db.engine.execute(statement)
+        for row in results:
+            count += 1
+        if count >= 1:
+            exist = True
+        else:
+            exist = False
+        if not exist:
+            if new_username is not None:
+                user.username = new_username
+            db.session.commit()
+            return redirect(url_for('profile'))
+        else:
+            return redirect(url_for('update_profile'))
