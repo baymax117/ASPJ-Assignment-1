@@ -27,7 +27,7 @@ $(document).ready(function(){
                 };
                 for (entry in reviews){
                     if (reviews[entry][0] == data[product][0]){
-                        $(".reviews").html($(".reviews").html() + reviews[entry][1] + ": " + reviews[entry][2] + "\n")
+                        $(".reviews").text($(".reviews").text() + reviews[entry][1] + ": " + reviews[entry][2] + "\n")
                     };
                 };
             };
