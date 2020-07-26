@@ -293,7 +293,7 @@ def home():
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     cart_no = 0
-    if current_user is None:
+    if current_user.is_anonymous:
         user = None
     else:
         user = current_user
