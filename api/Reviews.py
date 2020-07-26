@@ -27,5 +27,5 @@ def add(product_id):
             result = db.engine.execute(statement)
             for row in result:
                 print(row)
-            update_js(route='../static/js/Shop.js')
+            update_js()
     return redirect(url_for('home'))

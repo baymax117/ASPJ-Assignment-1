@@ -2,4 +2,6 @@
 
 {% block content %}
 <h3>Hello {{ user.username }}</h3>
+<p>
+<a href="{{ url_for('update_profile', user_id=user.id)}}">{{ user.username }}</a></p>
 {% endblock %}
