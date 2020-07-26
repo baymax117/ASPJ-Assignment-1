@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for
+from flask import Blueprint, request, redirect, url_for, current_app
 from flask_login import current_user
 from Database import Reviews
 from sqlalchemy.sql import text

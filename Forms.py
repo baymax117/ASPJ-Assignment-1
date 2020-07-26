@@ -29,19 +29,27 @@ class CreateUserForm(FlaskForm):
 class ForgetPasswordForm_Email(FlaskForm):
     email = StringField('Email', validators=[InputRequired(), Email(message="Invalid Email"), Length(max=60)])
 
+class ForgetPasswordForm_Security(FlaskForm):
+    security_questions = SelectField(label="Security question", validators=[InputRequired()],
+                                     choices=[('Mother\'s middle name', 'Mother\'s middle name'),
+                                              ('Your\'s pet name', 'Your\'s pet name'),
+                                              ('Your favourite food','Your favourite food')])
+
+    security_questions_answer = StringField('Answer', validators=[InputRequired()])
+
 class ForgetPasswordForm(FlaskForm):
-    security_questions = StringField(label="Security question")
-    # security_questions = StringField(label="Security question",
-    #                                  validators=[InputRequired()],
-    #                                  choices=[('Mother\'s middle name', 'Mother\'s middle name'),
-    #                                           ('Your\'s pet name', 'Your\'s pet name'),
-    #                                           ('Your favourite food', 'Your favourite food')])
-    security_questions_answer = StringField('Your secret answer', validators=[InputRequired()])
+    #security_questions = StringField(label="Security question")
+    security_questions = SelectField(label="Security question (if you want to reset, select new questions)",
+                                     validators=[InputRequired()],
+                                     choices=[('Mother\'s middle name', 'Mother\'s middle name'),
+                                              ('Your\'s pet name', 'Your\'s pet name'),
+                                              ('Your favourite food', 'Your favourite food')])
+
+    security_questions_answer = StringField('Your secret answer (if you want to reset, input new answer, if not key in original answer)', validators=[InputRequired()])
 
     newpassword = PasswordField('new password', validators=[InputRequired(), Length(min=8, max=150)])
     newconfirmPassword = PasswordField('Confirm Password',
-                                    validators=[InputRequired(),EqualTo('newpassword',
-                                                                        message="Password does not match")])
+                                    validators=[InputRequired(), EqualTo('newpassword', message="Password does not match")])
 
 
 class PaymentForm(FlaskForm):
