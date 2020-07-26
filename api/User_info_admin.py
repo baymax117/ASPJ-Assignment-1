@@ -41,8 +41,6 @@ def token_required(f):
 @admin_api.route('/allusersinfo', methods=['GET'])
 @token_required
 def checkalluserinfo(current_user):
-    if BadRequest:
-        raise BadRequest()
 
     if not current_user.is_admin:
         return jsonify({'Message' : 'Acess Denied'})
