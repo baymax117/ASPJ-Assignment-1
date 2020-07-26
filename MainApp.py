@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify, make_response
-from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm, ForgetPasswordForm_Security ,PaymentForm
+from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm, \
+    ForgetPasswordForm_Security, PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 from functools import wraps
 from sqlalchemy.sql import text
@@ -8,7 +9,6 @@ from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import os
-
 
 # from datetime import timedelta
 from api.Cart import cart_api
@@ -20,15 +20,14 @@ from api.Login_first import login_api
 from api.User_info_admin import admin_api
 from api.update_profile import update_profile_api
 
-#---------Secure Broken Object level authorization imports-----
+# ---------Secure Broken Object level authorization imports-----
 import jwt
 import datetime
 import uuid
 import hashlib
 import bcrypt
-#---------Secure Broken Object level authorization imports-----
 
-
+# ---------Secure Broken Object level authorization imports-----
 
 
 app = Flask(__name__)
@@ -36,11 +35,9 @@ app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
 app.register_blueprint(update_profile_api, url_prefix='/api/update_profile')
 
-
 app.register_blueprint(login_api, url_prefix='/api/api_login')
 app.register_blueprint(user_info_api, url_prefix='/api/User_info')
 app.register_blueprint(admin_api, url_prefix='/api/admin_functions')
-
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
@@ -69,7 +66,7 @@ user_schema = UserSchema()  # expect 1 record back
 users_schema = UserSchema(many=True)  # expect multiple record back
 
 
-#---------Secure Broken Object level authorization-----
+# ---------Secure Broken Object level authorization-----
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -79,40 +76,41 @@ def token_required(f):
             token = request.headers['x-access-token']
 
         if not token:
-            return jsonify({'message' : 'Token is missing!'}), 401
+            return jsonify({'message': 'Token is missing!'}), 401
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
             current_user = User.query.filter_by(public_id=data['public_id']).first()
         except:
-            return jsonify({'message' : 'Token is invalid!'}), 401
+            return jsonify({'message': 'Token is invalid!'}), 401
 
         return f(current_user, *args, **kwargs)
 
     return decorated
-#---------Secure Broken Object level authorization-----
 
-#-------------------ZY's API---------------------
 
-#Admin functions
+# ---------Secure Broken Object level authorization-----
+
+# -------------------ZY's API---------------------
+
+# Admin functions
 @app.route('/allusersinfo', methods=['GET'])
 @token_required
 def checkalluserinfo(current_user):
-
     if not current_user.is_admin:
-        return jsonify({'Message' : 'Acess Denied'})
+        return jsonify({'Message': 'Acess Denied'})
 
     users_list = User.query.all()
     result = users_schema.dump(users_list)
 
     return jsonify(data=result)
 
+
 @app.route('/checkoneuserinfo/<public_id>', methods=['GET'])
 @token_required
-def checkoneuserinfo(current_user , public_id):
-
+def checkoneuserinfo(current_user, public_id):
     if not current_user.is_admin:
-        return jsonify({'Message' : 'Acess Denied'})
+        return jsonify({'Message': 'Acess Denied'})
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -127,7 +125,7 @@ def checkoneuserinfo(current_user , public_id):
 @token_required
 def create_user(current_user):
     if not current_user.is_admin:
-        return jsonify({'Message' : 'Unauthorized to perform that function'})
+        return jsonify({'Message': 'Unauthorized to perform that function'})
 
     data = request.get_json()
 
@@ -137,32 +135,33 @@ def create_user(current_user):
                     username=data['username'],
                     password=hashed_password,
                     email=data['email'],
-                    security_questions = data['security_questions'],
-                    security_questions_answer = data['security_questions_answer'],
-                    is_active = True,
-                    is_authenticated = False,
-                    is_admin = False)
+                    security_questions=data['security_questions'],
+                    security_questions_answer=data['security_questions_answer'],
+                    is_active=True,
+                    is_authenticated=False,
+                    is_admin=False)
 
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({'message' : 'New user created!'})
+    return jsonify({'message': 'New user created!'})
+
 
 @app.route('/deleteuser/<public_id>', methods=['DELETE'])
 @token_required
 def delete_user(current_user, public_id):
     if not current_user.is_admin:
-        return jsonify({'Message' : 'Unauthorized to perform that function'})
+        return jsonify({'Message': 'Unauthorized to perform that function'})
 
     user = User.query.filter_by(public_id=public_id).first()
 
     if not user:
-        return jsonify({'message' : 'No user found!'})
+        return jsonify({'message': 'No user found!'})
 
     db.session.delete(user)
     db.session.commit()
 
-    return jsonify({'message' : 'The user has been deleted!'})
+    return jsonify({'message': 'The user has been deleted!'})
 
 
 @app.route('/apilogin')
@@ -170,26 +169,28 @@ def api_login():
     auth = request.authorization
 
     if not auth or not auth.username or not auth.password:
-        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
+        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
     user = User.query.filter_by(username=auth.username).first()
 
     if not user:
-        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
+        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
+        token = jwt.encode(
+            {'public_id': user.public_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
+            app.config['SECRET_KEY'])
 
-        return jsonify({'token' : token.decode('UTF-8')})
+        return jsonify({'token': token.decode('UTF-8')})
 
-    return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
+    return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
 
-#User functions
+# User functions
 @app.route('/enquireuserinfo', methods=['GET'])
 @token_required
 def get_user_info(current_user):
-    user = User.query.filter_by(public_id = current_user.public_id).first()
+    user = User.query.filter_by(public_id=current_user.public_id).first()
 
     if user:
         result = user_schema.dump(user)
@@ -204,7 +205,7 @@ def test_info(current_user, public_id):
     user = User.query.filter_by(public_id=public_id).first()
 
     if current_user.public_id != public_id:
-        return jsonify({'Message' : 'Acess Denied'})
+        return jsonify({'Message': 'Acess Denied'})
 
     if user:
         result = user_schema.dump(user)
@@ -213,9 +214,7 @@ def test_info(current_user, public_id):
         return jsonify(message="User does not exist"), 404
 
 
-#------------------ZY's API---------------------
-
-
+# ------------------ZY's API---------------------
 
 
 def login_required(role):
@@ -230,6 +229,7 @@ def login_required(role):
         except AttributeError:
             print('You need to log in')
             return redirect(url_for('login'))
+
     return wrap
 
 
@@ -241,6 +241,7 @@ def admin_required(yeet):
         else:
             print('You need to be an Admin')
             return redirect(url_for('home'))
+
     return wrap
 
 
@@ -335,7 +336,6 @@ def getallusersrecords():
 #     return redirect(url_for('home'))
 
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     # if current_user.is_authenticated:
@@ -353,11 +353,10 @@ def login():
         # hashed_username_data = hashlib.sha256(form.username.data.encode()).hexdigest()
         user = User.query.filter_by(username=form.username.data).first()
 
-
         # if user is None or not user.check_password(form.password.data):
         if user:
             # if check_password_hash(user.password, form.password.data):
-            if bcrypt.checkpw(form.password.data.encode(),  user.password):
+            if bcrypt.checkpw(form.password.data.encode(), user.password):
                 login_user(user, remember=form.remember_me.data)
                 user.activate_is_authenticated()
                 print(user.is_authenticated)
@@ -411,10 +410,10 @@ def signup():
 
         # hashed_username_data = hashlib.sha256(form.username.data.encode()).hexdigest()
 
-        #--Plaintext---
+        # --Plaintext---
         # exists = db.session.query(User.id).filter_by(email=form.email.data).scalar()
         # exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
-        #--Plaintext---
+        # --Plaintext---
 
         # --sha512---
         hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
@@ -422,28 +421,28 @@ def signup():
         exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
         # --sha512---
 
-        #bcrypt
+        # bcrypt
         # hashed_email_data = bcrypt.hashpw(form.email.data.encode(), bcrypt.gensalt())
         # exists = db.session.query(User.id).filter_by(email=hashed_email_data).scalar()
         # exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
-        #bcrypt
+        # bcrypt
 
         if exists is None and exists2 is None:
-            #---sha algorithm----
+            # ---sha algorithm----
             # hashed_password = generate_password_hash(form.password.data, method='sha512') #with salt
             # hashed_security_Q = generate_password_hash(form.security_questions.data, method='sha1') #with salt
             # hashed_security_ans = generate_password_hash(form.security_questions_answer.data, method='sha512') #with salt
-            #---sha algorithm----
+            # ---sha algorithm----
 
-            #bcrypt
+            # bcrypt
             hashed_password = bcrypt.hashpw(form.password.data.encode(), bcrypt.gensalt())
             hashed_security_Q = bcrypt.hashpw(form.security_questions.data.encode(), bcrypt.gensalt())
             hashed_security_ans = bcrypt.hashpw(form.security_questions_answer.data.encode(), bcrypt.gensalt())
-            #bcrypt
-
+            # bcrypt
 
             # password=form.password.data
-            newuser = User(public_id=str(uuid.uuid4()),username=form.username.data, email=hashed_email_data, password=hashed_password,
+            newuser = User(public_id=str(uuid.uuid4()), username=form.username.data, email=hashed_email_data,
+                           password=hashed_password,
                            security_questions=hashed_security_Q,
                            security_questions_answer=hashed_security_ans,
                            is_active=True, is_authenticated=False, is_admin=False)
@@ -475,10 +474,10 @@ def forgotpassword():
     # form2 = ForgetPasswordForm()
     if form1.validate_on_submit():
 
-        #---sha algorithm---
+        # ---sha algorithm---
         hashed_email_data = hashlib.sha256(form1.email.data.encode()).hexdigest()
         email_exist = db.session.query(User.id).filter_by(email=hashed_email_data).scalar()
-        #---sha algorithm---
+        # ---sha algorithm---
         # hashed_email_data = bcrypt.hashpw(form1.email.data.encode(), bcrypt.gensalt())
         # email_exist = db.session.query(User.id).filter_by(email=hashed_email_data).scalar()
 
@@ -506,10 +505,10 @@ def forgotpassword():
                             print('REACHED')
                             update_user = User.query.filter_by(email=hashed_email_data).first()
 
-                            #---Sha algorithm---
+                            # ---Sha algorithm---
                             # hashed_password = generate_password_hash(form2.newpassword.data, method='sha512')
                             # update_user.password = hashed_password
-                            #---Sha algorithm---
+                            # ---Sha algorithm---
 
                             hashed_password = bcrypt.hashpw(form2.newpassword.data.encode(), bcrypt.gensalt())
 
@@ -518,7 +517,8 @@ def forgotpassword():
                             flash("You have successfully reset your password")
                             return redirect(url_for('login'))
 
-                        return render_template('forgot_password.html', title='Reset Password', form1=form1, form11=form11, form2=form2)
+                        return render_template('forgot_password.html', title='Reset Password', form1=form1,
+                                               form11=form11, form2=form2)
                     else:
                         print("OH NO")
                         flash("Incorrect security questions answer")
@@ -531,7 +531,7 @@ def forgotpassword():
             #     flash('Email does not exist')
             #     return redirect((url_for('forgotpassword')))
 
-            return render_template('forgot_password.html', title='Reset Password',form1=form1, form11=form11)
+            return render_template('forgot_password.html', title='Reset Password', form1=form1, form11=form11)
 
         else:
             flash('Email does not exist')
@@ -541,15 +541,10 @@ def forgotpassword():
 
 @app.route('/profile', methods=['GET'])
 def profile():
-    user_id = request.args.get('user_id')
-    if user_id is None:
+    if current_user.id is None:
         return redirect(url_for('/'))
     else:
-        user = User.query.filter_by(id=user_id).first()
-        if user is None:
-            return redirect(url_for('home'))
-        else:
-            return render_template('profile.html', user=user)
+        return render_template('profile.html', user=current_user)
 
 
 @app.route('/orders', methods=['GET'])
@@ -608,10 +603,9 @@ def payment():
         # print(request.form.getlist('Remember_info'))
         # if form.validate_on_submit() and request.form.getlist('Remember_info') == ['Remember_info']:
         if form.validate_on_submit():
-            print("PATH 1 ") # Card exist in the database
+            print("PATH 1 ")  # Card exist in the database
             # exist_cardnum = db.session.query(Payment.cardnum).filter_by(cardnum=form.cardNum.data).first()
             # print(exist_cardnum)
-
 
             print('current user id', current_user.id)
 
@@ -620,7 +614,6 @@ def payment():
             for row in results:
                 cards_num = row.cardnum
                 cardlist.append(cards_num)
-
 
             user_card_exist = db.session.query(Payment).filter_by(id=current_user.id).first()
             print(user_card_exist)
@@ -660,17 +653,17 @@ def payment():
                     hashed_cvv = bcrypt.hashpw(str(form.cvv.data).encode(), bcrypt.gensalt())
 
                     card = Payment(name=form.name.data,
-                           email=hashed_email_data,
-                           address=form.address.data,
-                           country=form.country.data,
-                           city=form.city.data,
-                           zip=form.zip.data,
-                           cardname=hashed_cardname,
-                           cardnum=hashed_cardnum,
-                           expmonth=hashed_expmonth,
-                           expyear=hashed_expyear,
-                           cvv=hashed_cvv,
-                           id=user.get_id())
+                                   email=hashed_email_data,
+                                   address=form.address.data,
+                                   country=form.country.data,
+                                   city=form.city.data,
+                                   zip=form.zip.data,
+                                   cardname=hashed_cardname,
+                                   cardnum=hashed_cardnum,
+                                   expmonth=hashed_expmonth,
+                                   expyear=hashed_expyear,
+                                   cvv=hashed_cvv,
+                                   id=user.get_id())
 
                     # card = Payment(name=form.name.data,
                     #        email=form.email.data,
@@ -697,7 +690,7 @@ def payment():
                             db.session.commit()
                     return redirect(url_for('home'))
 
-            #print(request.form.getlist('Remember_info'))
+            # print(request.form.getlist('Remember_info'))
 
             # print("PATH 1.2 ") #When card does not exist in the database
             # print(bcrypt.checkpw(form.cardNum.data.encode(), user.cardname))
@@ -710,17 +703,17 @@ def payment():
             hashed_cvv = bcrypt.hashpw(str(form.cvv.data).encode(), bcrypt.gensalt())
 
             card = Payment(name=form.name.data,
-                   email=hashed_email_data,
-                   address=form.address.data,
-                   country=form.country.data,
-                   city=form.city.data,
-                   zip=form.zip.data,
-                   cardname=hashed_cardname,
-                   cardnum=hashed_cardnum,
-                   expmonth=hashed_expmonth,
-                   expyear=hashed_expyear,
-                   cvv=hashed_cvv,
-                   id=user.get_id())
+                           email=hashed_email_data,
+                           address=form.address.data,
+                           country=form.country.data,
+                           city=form.city.data,
+                           zip=form.zip.data,
+                           cardname=hashed_cardname,
+                           cardnum=hashed_cardnum,
+                           expmonth=hashed_expmonth,
+                           expyear=hashed_expyear,
+                           cvv=hashed_cvv,
+                           id=user.get_id())
 
             # card = Payment(name=form.name.data,
             #                email=form.email.data,
@@ -793,7 +786,6 @@ def payment():
         # else:
         #     return redirect(url_for('payment'))
 
-
     return render_template('payment.html', title='Payment', form=form, user=user)
 
 
@@ -807,7 +799,6 @@ def admin_test():
 @app.route('/update_profile', methods=['GET', 'POST'])
 @login_required
 def update_profile():
-
     return render_template('update_profile.html', user=current_user)
 
 
