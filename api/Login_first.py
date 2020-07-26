@@ -4,6 +4,8 @@ from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import jwt
+import bcrypt
+from werkzeug.exceptions import BadRequest
 
 
 login_api = Blueprint('login_api', __name__)
@@ -14,6 +16,9 @@ login_api = Blueprint('login_api', __name__)
 
 @login_api.route('/apilogin')
 def api_login():
+    if BadRequest:
+        raise BadRequest()
+
     auth = request.authorization
 
     if not auth or not auth.username or not auth.password:
@@ -24,7 +29,8 @@ def api_login():
     if not user:
         return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
 
-    if check_password_hash(user.password, auth.password):
+    # if check_password_hash(user.password, auth.password):
+    if bcrypt.checkpw(auth.password.encode(), user.password):
         token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
 
         return jsonify({'token' : token.decode('UTF-8')})
