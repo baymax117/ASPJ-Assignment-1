@@ -7,6 +7,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 import hashlib
+import bcrypt
+from werkzeug.exceptions import BadRequest
 
 
 
@@ -39,6 +41,8 @@ def token_required(f):
 @admin_api.route('/allusersinfo', methods=['GET'])
 @token_required
 def checkalluserinfo(current_user):
+    if BadRequest:
+        raise BadRequest()
 
     if not current_user.is_admin:
         return jsonify({'Message' : 'Acess Denied'})
@@ -54,6 +58,8 @@ def checkalluserinfo(current_user):
 @admin_api.route('/checkoneuserinfo/<public_id>', methods=['GET'])
 @token_required
 def checkoneuserinfo(current_user , public_id):
+    if BadRequest:
+        raise BadRequest()
 
     if not current_user.is_admin:
         return jsonify({'Message' : 'Acess Denied'})
@@ -72,6 +78,8 @@ def checkoneuserinfo(current_user , public_id):
 @admin_api.route('/createuser', methods=['POST'])
 @token_required
 def create_user(current_user):
+    if BadRequest:
+        raise BadRequest()
     if not current_user.is_admin:
         return jsonify({'Message' : 'Unauthorized to perform that function'})
 
@@ -87,10 +95,12 @@ def create_user(current_user):
 
     if exists is None and exists2 is None:
 
-        hashed_password = generate_password_hash(request.form['password'], method='sha512')
-        hashed_security_Q = generate_password_hash(request.form['security_questions'], method='sha1') #with salt
-        hashed_security_ans = generate_password_hash(request.form['security_questions_answer'], method='sha512') #with salt
-
+        # hashed_password = generate_password_hash(request.form['password'], method='sha512')
+        # hashed_security_Q = generate_password_hash(request.form['security_questions'], method='sha1') #with salt
+        # hashed_security_ans = generate_password_hash(request.form['security_questions_answer'], method='sha512') #with salt
+        hashed_password = bcrypt.hashpw(request.form['password'].encode(), bcrypt.gensalt())
+        hashed_security_Q = bcrypt.hashpw(request.form['security_questions'].encode(), bcrypt.gensalt())
+        hashed_security_ans = bcrypt.hashpw(request.form['security_questions_answer'].encode(), bcrypt.gensalt())
 
         new_user = User(public_id=str(uuid.uuid4()),
                         username=request.form['username'],

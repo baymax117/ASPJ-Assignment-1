@@ -446,7 +446,7 @@ def signup():
             newuser = User(public_id=str(uuid.uuid4()),username=form.username.data, email=hashed_email_data, password=hashed_password,
                            security_questions=hashed_security_Q,
                            security_questions_answer=hashed_security_ans,
-                           is_active=True, is_authenticated=False, is_admin=True)
+                           is_active=True, is_authenticated=False, is_admin=False)
             # newuser = User(public_id=str(uuid.uuid4()),username=form.username.data, email=form.email.data, password=hashed_password,
             #                security_questions=form.security_questions.data,
             #                security_questions_answer=form.security_questions_answer.data,
