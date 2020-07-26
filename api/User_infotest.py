@@ -3,6 +3,7 @@ from Database import *
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from functools import wraps
 import jwt
+from werkzeug.exceptions import BadRequest
 
 
 user_schema = UserSchema()  #expect 1 record back
@@ -36,6 +37,9 @@ def token_required(f):
 @user_info_api.route('/enquireuserinfo/<public_id>', methods=['GET'])
 @token_required
 def get_user_info(current_user, public_id):
+    if BadRequest:
+        raise BadRequest()
+
     user = User.query.filter_by(public_id = public_id).first()
 
     if current_user.public_id != public_id:
