@@ -22,9 +22,11 @@ def update():
         else:
             exist = False
         if not exist:
+            return redirect(url_for('update_profile'))
+        elif len(new_username) < 4 or len(new_username) > 50:
+            return redirect(url_for('update_profile'))
+        else:
             if new_username is not None:
                 user.username = new_username
-            db.session.commit()
+                db.session.commit()
             return redirect(url_for('profile'))
-        else:
-            return redirect(url_for('update_profile'))
