@@ -17,21 +17,16 @@ def update():
         results = db.engine.execute(statement)
         for row in results:
             count += 1
-        print(count)
         if count >= 1:
             exist = True
         else:
             exist = False
-        print(exist)
         if exist:
-            print("existing")
             return redirect(url_for('update_profile'))
         elif len(new_username) < 4 or len(new_username) > 50:
-            print("outside range")
             return redirect(url_for('update_profile'))
         else:
             if new_username is not None:
                 user.username = new_username
                 db.session.commit()
-                print("updated")
             return redirect(url_for('profile'))
