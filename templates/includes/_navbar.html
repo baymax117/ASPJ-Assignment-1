@@ -20,6 +20,11 @@
                 <a class="nav-link" href='/signup'>Sign Up</a>
             </li>
             {% else %}
+            {% if current_user.is_admin %}
+            <li>
+              <a class="nav-link" href="/admin_test">Admin</a>
+            </li>
+            {% endif %}
             <li class="nav-item">
               <a class="nav-link" href="/cart">Cart ({{ cart_no }})</a>
             </li>
