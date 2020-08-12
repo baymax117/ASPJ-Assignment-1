@@ -1,6 +1,5 @@
 from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify, make_response
-from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm, \
-    ForgetPasswordForm_Security, PaymentForm
+from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm, ForgetPasswordForm_Security, PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 from functools import wraps
 from sqlalchemy.sql import text
@@ -9,8 +8,7 @@ from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import os
-
-# from datetime import timedelta
+from login_logger import create_log, update_log
 from api.Cart import cart_api
 from api.Reviews import review_api
 from api.User_infotest import user_info_api
@@ -65,6 +63,7 @@ login_manager.login_view = 'login'
 user_schema = UserSchema()  # expect 1 record back
 users_schema = UserSchema(many=True)  # expect multiple record back
 
+SESSION_COOKIE_SECURE = True
 
 # ---------Secure Broken Object level authorization-----
 def token_required(f):
@@ -240,6 +239,7 @@ def load_user(id):
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
+    print(request.remote_addr)
     cart_no = 0
     if current_user.is_anonymous:
         user = None
@@ -332,8 +332,7 @@ def login():
                 db.session.add(user)
                 db.session.commit()
                 session['user'] = request.form['username']
-                print("Login sucessful")
-
+                print("Login successful")
                 return redirect(url_for('home'))
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
@@ -815,4 +814,4 @@ def reset_database():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='192.168.1.100')
