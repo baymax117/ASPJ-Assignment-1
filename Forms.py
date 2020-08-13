@@ -3,6 +3,12 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Integ
 from wtforms.validators import ValidationError, InputRequired, Email, EqualTo, Length, NumberRange
 
 
+def validate_name(form, field):
+    for char in field.data:
+        if not char.isdigit() and not char.isalpha() and not char == '_':
+            raise ValidationError("The username can only contain Alphanumeric and underscore(_).")
+
+
 class UserLoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=50)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=70)])
@@ -11,7 +17,7 @@ class UserLoginForm(FlaskForm):
 
 
 class CreateUserForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=50)])
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=50), validate_name])
     email = StringField('Email', validators=[InputRequired(), Email(message="Invalid Email"), Length(max=60)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=150)])
     confirmPassword = PasswordField('Confirm Password',
@@ -26,8 +32,10 @@ class CreateUserForm(FlaskForm):
     # confirmPassword = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password')])
     # submit = SubmitField('Sign up!')
 
+
 class ForgetPasswordForm_Email(FlaskForm):
     email = StringField('Email', validators=[InputRequired(), Email(message="Invalid Email"), Length(max=60)])
+
 
 class ForgetPasswordForm_Security(FlaskForm):
     security_questions = SelectField(label="Security question", validators=[InputRequired()],
@@ -36,6 +44,7 @@ class ForgetPasswordForm_Security(FlaskForm):
                                               ('Your favourite food','Your favourite food')])
 
     security_questions_answer = StringField('Answer', validators=[InputRequired()])
+
 
 class ForgetPasswordForm(FlaskForm):
     #security_questions = StringField(label="Security question")

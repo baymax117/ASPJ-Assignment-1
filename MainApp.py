@@ -8,7 +8,7 @@ from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import os
-from login_logger import create_log, update_log
+from login_logger import create_log, update_log, get_log
 from api.Cart import cart_api
 from api.Reviews import review_api
 from api.User_infotest import user_info_api
@@ -239,7 +239,6 @@ def load_user(id):
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    print(request.remote_addr)
     cart_no = 0
     if current_user.is_anonymous:
         user = None
@@ -332,8 +331,13 @@ def login():
                 db.session.add(user)
                 db.session.commit()
                 session['user'] = request.form['username']
-                print("Login successful")
+
+                # successful attempt
+                update_log(create_log(request.form['username'], request.remote_addr, 'pass'))
                 return redirect(url_for('home'))
+
+        # failed attempt
+        update_log(create_log(request.form['username'], request.remote_addr, 'fail'))
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
 
@@ -776,10 +780,11 @@ def payment():
     return render_template('payment.html', title='Payment', form=form, user=user)
 
 
-@app.route('/admin_test', methods=['GET', 'POST'])
-def admin_test():
+@app.route('/admin_page', methods=['GET', 'POST'])
+def admin_page():
     if current_user.is_admin:
-        return render_template('admin_page.html', user=current_user), 200
+        log_list = get_log()
+        return render_template('admin_page.html', user=current_user, logs=log_list), 200
     else:
         return redirect(url_for("home"))
 
