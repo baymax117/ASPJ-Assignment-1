@@ -2,7 +2,7 @@
 
 database users:
 User 1 (admin):
-admin
+admin 
 admin@admin.san
 abcd1234
 doge
