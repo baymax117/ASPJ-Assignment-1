@@ -45,8 +45,10 @@ def get_log():
         raw_logs = log.readlines()
         for raw_log in raw_logs:
             processed_log = raw_log.strip('\n')
-            processed_log.split(' ')
+            processed_log = processed_log.split()
             logs.insert(0, processed_log)
         log.close()
 
     return logs
+
+get_log()

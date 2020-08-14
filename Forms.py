@@ -10,8 +10,8 @@ def validate_name(form, field):
 
 
 class UserLoginForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=50)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=70)])
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=50), validate_name])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=50)])
     remember_me = BooleanField('Remember Me')
     # submit = SubmitField('Sign In')
 
@@ -19,7 +19,7 @@ class UserLoginForm(FlaskForm):
 class CreateUserForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=50), validate_name])
     email = StringField('Email', validators=[InputRequired(), Email(message="Invalid Email"), Length(max=60)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=150)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=50)])
     confirmPassword = PasswordField('Confirm Password',
                                     validators=[InputRequired(), EqualTo('password', message="Password does not match")])
 

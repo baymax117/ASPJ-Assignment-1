@@ -2,21 +2,36 @@
 
 {% block content %}
 <h3>Hello Admin</h3>
-<table>
+<hr>
+<h4>Error Logs</h4>
+<table class="table table-striped" id="logs">
     <thead>
     <tr>
         <th>Date</th>
         <th>Time</th>
         <th>Ip Address</th>
         <th>Name</th>
-        <th></th>
+        <th>Status</th>
     </tr>
     </thead>
+    <tbody>
 {% for log in logs %}
     <tr>
-        <td>{{ entry[0] }}</td>
-        <td>{{ entry }}</td>
+        <td>{{ log[0] }}</td>
+        <td>{{ log[1] }}</td>
+        <td>{{ log[2] }}</td>
+        <td>{{ log[3] }}</td>
+        <td>{{ log[4] }}</td>
     </tr>
 {% endfor %}
+    </tbody>
 </table>
+{% endblock %}
+
+{% block function %}
+<script>
+    $(document).on('ready',function() {
+        $('#logs').DataTable();
+    });
+</script>
 {% endblock %}

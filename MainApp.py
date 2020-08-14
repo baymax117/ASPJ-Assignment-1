@@ -331,7 +331,6 @@ def login():
                 db.session.add(user)
                 db.session.commit()
                 session['user'] = request.form['username']
-
                 # successful attempt
                 update_log(create_log(request.form['username'], request.remote_addr, 'pass'))
                 return redirect(url_for('home'))
