@@ -96,7 +96,7 @@ def create_user(current_user):
         # hashed_password = generate_password_hash(request.form['password'], method='sha512')
         # hashed_security_Q = generate_password_hash(request.form['security_questions'], method='sha1') #with salt
         # hashed_security_ans = generate_password_hash(request.form['security_questions_answer'], method='sha512') #with salt
-        hashed_password = bcrypt.hashpw(request.form['password'].encode(), bcrypt.gensalt())
+        hashed_password = bcrypt.hashpw(request.form['password'].encode(), bcrypt.gensalt(rounds=16))
         hashed_security_Q = bcrypt.hashpw(request.form['security_questions'].encode(), bcrypt.gensalt())
         hashed_security_ans = bcrypt.hashpw(request.form['security_questions_answer'].encode(), bcrypt.gensalt())
 

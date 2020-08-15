@@ -424,7 +424,7 @@ def signup():
             # ---sha algorithm----
 
             # bcrypt
-            hashed_password = bcrypt.hashpw(form.password.data.encode(), bcrypt.gensalt())
+            hashed_password = bcrypt.hashpw(form.password.data.encode(), bcrypt.gensalt(rounds=16))
             hashed_security_Q = bcrypt.hashpw(form.security_questions.data.encode(), bcrypt.gensalt())
             hashed_security_ans = bcrypt.hashpw(form.security_questions_answer.data.encode(), bcrypt.gensalt())
             # bcrypt
@@ -502,7 +502,7 @@ def forgotpassword():
                             # update_user.password = hashed_password
                             # ---Sha algorithm---
 
-                            hashed_password = bcrypt.hashpw(form2.newpassword.data.encode(), bcrypt.gensalt())
+                            hashed_password = bcrypt.hashpw(form2.newpassword.data.encode(), bcrypt.gensalt(rounds=16))
 
                             update_user.password = hashed_password
                             db.session.commit()
@@ -639,10 +639,10 @@ def payment():
 
                     hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
                     hashed_cardname = bcrypt.hashpw(form.cardName.data.encode(), bcrypt.gensalt())
-                    hashed_cardnum = bcrypt.hashpw(str(form.cardNum.data).encode(), bcrypt.gensalt())
+                    hashed_cardnum = bcrypt.hashpw(str(form.cardNum.data).encode(), bcrypt.gensalt(rounds=16))
                     hashed_expmonth = bcrypt.hashpw(form.expmonth.data.encode(), bcrypt.gensalt())
                     hashed_expyear = bcrypt.hashpw(form.expyear.data.encode(), bcrypt.gensalt())
-                    hashed_cvv = bcrypt.hashpw(str(form.cvv.data).encode(), bcrypt.gensalt())
+                    hashed_cvv = bcrypt.hashpw(str(form.cvv.data).encode(), bcrypt.gensalt(rounds=16))
 
                     card = Payment(name=form.name.data,
                                    email=hashed_email_data,
@@ -689,10 +689,10 @@ def payment():
 
             hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
             hashed_cardname = bcrypt.hashpw(form.cardName.data.encode(), bcrypt.gensalt())
-            hashed_cardnum = bcrypt.hashpw(str(form.cardNum.data).encode(), bcrypt.gensalt())
+            hashed_cardnum = bcrypt.hashpw(str(form.cardNum.data).encode(), bcrypt.gensalt(rounds=16))
             hashed_expmonth = bcrypt.hashpw(form.expmonth.data.encode(), bcrypt.gensalt())
             hashed_expyear = bcrypt.hashpw(form.expyear.data.encode(), bcrypt.gensalt())
-            hashed_cvv = bcrypt.hashpw(str(form.cvv.data).encode(), bcrypt.gensalt())
+            hashed_cvv = bcrypt.hashpw(str(form.cvv.data).encode(), bcrypt.gensalt(rounds=16))
 
             card = Payment(name=form.name.data,
                            email=hashed_email_data,
