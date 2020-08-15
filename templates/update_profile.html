@@ -31,6 +31,7 @@
 </h1>
 
 <form name="update_form" method="POST" action="/api/update_profile/update">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <h3>
         Enter new username
     </h3>

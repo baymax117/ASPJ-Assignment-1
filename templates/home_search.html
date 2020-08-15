@@ -120,6 +120,7 @@ textarea{
                 <p id="item-desc"></p>
                 <form class="add-cart" method="post">
                     <button class="btn btn-primary" type="submit">Add To Cart</button>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 </form>
             </div>
             <div class="col">

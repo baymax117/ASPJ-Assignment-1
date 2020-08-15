@@ -8,7 +8,7 @@ from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import os
-from login_logger import create_log, update_log, get_log
+from login_logger import create_log, update_log, get_log, send_log, check_log
 from api.Cart import cart_api
 from api.Reviews import review_api
 from api.User_infotest import user_info_api
@@ -26,9 +26,10 @@ import hashlib
 import bcrypt
 
 # ---------Secure Broken Object level authorization imports-----
-
+from flask_wtf import CSRFProtect
 
 app = Flask(__name__)
+crsf = CSRFProtect(app)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
 app.register_blueprint(update_profile_api, url_prefix='/api/update_profile')
@@ -40,6 +41,7 @@ app.register_blueprint(admin_api, url_prefix='/api/admin_functions')
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
 app.config['JWT_SECRET_KEY'] = 'asp-project-security-api'
+app.config['WTF_CSRF_ENABLED'] = True
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
 # SECRET_KEY = os.environ.get('SECRET_KEY') or "asp-project-security"
@@ -357,11 +359,11 @@ def logout():
     user = current_user
     print("id", user.id)
     # print("name",current_user.username)
-    # print("not log out yet", current_user.is_authenticate())
+    # print("not login out yet", current_user.is_authenticate())
     user.deactivate_is_authenticated()
     db.session.add(user)
     db.session.commit()
-    # print("log out le",current_user.is_authenticate())
+    # print("login out le",current_user.is_authenticate())
     logout_user()
     return redirect(url_for("home"))
 
@@ -782,8 +784,20 @@ def payment():
 @app.route('/admin_page', methods=['GET', 'POST'])
 def admin_page():
     if current_user.is_admin:
-        log_list = get_log()
-        return render_template('admin_page.html', user=current_user, logs=log_list), 200
+        if request.method == 'POST':
+            date = request.form.get('date')
+            date = date.split('-')
+            date = '{}-{}-{}'.format(date[2], date[1], date[0])
+            # check if the date exists
+            if check_log(date):
+                send_log(date)
+                flash('access log for {} has been sent.'.format(date))
+            else:
+                flash('There is no access logs for {}'.format(date))
+            return redirect(url_for('admin_page'))
+        else:
+            log_list = get_log()
+            return render_template('admin_page.html', user=current_user, logs=log_list), 200
     else:
         return redirect(url_for("home"))
 

@@ -28,9 +28,9 @@
             <tr>
                 <td>{{ item[0] }}</td>
                 <td><img src="../static/img/{{ item[1] }}"></td>
-                <td><form action="/api/Cart/remove_cart/{{ item[4] }}" method="post"><button type="submit">-</button></form></td>
+                <td><form action="/api/Cart/remove_cart/{{ item[4] }}" method="post"><button type="submit">-</button><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/></form></td>
                 <td>{{ item[2] }}</td>
-                <td><form action="/api/Cart/add_cart/{{ item[4] }}" method="post"><button type="submit">+</button></form></td>
+                <td><form action="/api/Cart/add_cart/{{ item[4] }}" method="post"><button type="submit">+</button><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/></form></td>
                 <td>${{ "{:.2f}".format(item[3]) }}</td>
             </tr>
         {% endfor %}

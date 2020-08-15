@@ -3,7 +3,27 @@
 {% block content %}
 <h3>Hello Admin</h3>
 <hr>
-<h4>Error Logs</h4>
+<h4>Access Logs</h4>
+<hr>
+<form method="post" action="admin_page">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <label for="date">Email Access logs:</label>
+    <input id="date" type="date" name="date" required>
+    <button type="submit">send</button>
+</form>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                <span>{{ message }}</span>
+                <i class="close icon" onclick=delete_flash(this)>
+                <span aria-hidden="true">&times;</span>
+                </i>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<hr>
 <table class="table table-striped" id="logs">
     <thead>
     <tr>
@@ -33,5 +53,10 @@
     $(document).on('ready',function() {
         $('#logs').DataTable();
     });
+</script>
+<script>
+    function delete_flash(flash){
+        $(flash).parent().remove()
+    }
 </script>
 {% endblock %}

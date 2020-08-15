@@ -26,6 +26,9 @@ def update():
         elif len(new_username) < 4 or len(new_username) > 50:
             return redirect(url_for('update_profile'))
         else:
+            for char in new_username:
+                if not char.isdigit() and not char.isalpha() and not char == '_':
+                    return redirect(url_for('update_profile'))
             if new_username is not None:
                 user.username = new_username
                 db.session.commit()
