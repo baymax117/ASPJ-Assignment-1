@@ -1,4 +1,5 @@
-import datetime
+from datetime import datetime
+from datetime import timedelta
 import time
 import os
 import smtplib
@@ -9,7 +10,7 @@ from email import encoders
 
 # create a login with name, address, and status of whether login was successful
 def create_log(name, address, status):
-    current_time = datetime.datetime.now()
+    current_time = datetime.now()
     timestamp = "{}-{:02d}-{:02d} {:02d}:{:02d}".format(current_time.day, current_time.month, current_time.year, current_time.hour, current_time.minute)
     return "{} {} {} {}\n".format(timestamp, address, name, status)
 
@@ -92,3 +93,39 @@ def send_log(filename):
     text = message.as_string()
     session.sendmail(sender_address, receiver_address, text)
     session.quit()
+
+
+def multi_fail_log(address):
+    mail_content = 'Multiple failed attempts from {}'.format(address)
+
+    # The mail addresses and password
+    sender_address = 'dummypikachutest@gmail.com'
+    sender_pass = 'Q@erty1234'
+    receiver_address = 'dummypikachutest@gmail.com'
+
+    # Setup the MIME
+    message = MIMEMultipart()
+    message['From'] = sender_address
+    message['To'] = receiver_address
+    message['Subject'] = 'Multiple failed attempts'
+
+    # The body and the attachments for the mail
+    message.attach(MIMEText(mail_content, 'plain'))
+
+    # Create SMTP session for sending the mail
+    session = smtplib.SMTP('smtp.gmail.com', 587)  # use gmail with port
+    session.starttls()  # enable security
+    session.login(sender_address, sender_pass)  # login with mail_id and password
+    text = message.as_string()
+    session.sendmail(sender_address, receiver_address, text)
+    session.quit()
+
+
+def timeout():
+    return datetime.now() + timedelta(minutes=5)
+
+def time_clear(timeout):
+    if datetime.now() > timeout:
+        return True
+    else:
+        return False

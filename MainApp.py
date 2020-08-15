@@ -8,7 +8,7 @@ from Database import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import os
-from login_logger import create_log, update_log, get_log, send_log, check_log
+from login_logger import create_log, update_log, get_log, send_log, check_log, timeout, time_clear, multi_fail_log
 from api.Cart import cart_api
 from api.Reviews import review_api
 from api.User_infotest import user_info_api
@@ -314,6 +314,22 @@ def login():
 
     form = UserLoginForm()
     if form.validate_on_submit():
+        if 'timeout' in session:
+            if not time_clear(session['timeout']):
+                flash("Too many unsuccessful attempts, please try again later!")
+                return redirect(url_for('login'))
+            else:
+                session.pop('attempts')
+                session.pop('timeout')
+        if 'attempts' not in session:
+            session['attempts'] = 1
+        if session['attempts'] >= 5 and 'timeout' not in session:
+            session['timeout'] = timeout()
+            multi_fail_log(request.remote_addr)
+            flash("Too many unsuccessful attempts, please try again later!")
+            return redirect(url_for('login'))
+
+
         # input_username = form.username.data #
         # result = encrypt_username(input_username) #
         # print(result)
@@ -334,11 +350,13 @@ def login():
                 db.session.commit()
                 session['user'] = request.form['username']
                 # successful attempt
+                session.pop('attempts')
                 update_log(create_log(request.form['username'], request.remote_addr, 'pass'))
                 return redirect(url_for('home'))
 
         # failed attempt
         update_log(create_log(request.form['username'], request.remote_addr, 'fail'))
+        session['attempts'] += 1
         flash("Invalid username or password, please try again!")
         return redirect(url_for('login'))
 
