@@ -1,10 +1,8 @@
-from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify, make_response
+from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify
 from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm, ForgetPasswordForm_Security, PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user
-from functools import wraps
 from sqlalchemy.sql import text
 from Database import db, User, UserSchema, Product, Payment, Cart, db_create, db_drop, db_seed, update_js
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager
 import os
 from login_logger import create_log, update_log, get_log, send_log, check_log, timeout, time_clear, multi_fail_log
@@ -14,15 +12,9 @@ from api.User_infotest import user_info_api
 from api.Login_first import login_api
 from api.User_info_admin import admin_api
 from api.update_profile import update_profile_api
-
-# ---------Secure Broken Object level authorization imports-----
-import jwt
-import datetime
 import uuid
 import hashlib
 import bcrypt
-
-# ---------Secure Broken Object level authorization imports-----
 from flask_wtf import CSRFProtect
 from flask_caching import Cache
 
