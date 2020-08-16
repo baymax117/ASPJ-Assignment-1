@@ -27,7 +27,9 @@ import bcrypt
 
 # ---------Secure Broken Object level authorization imports-----
 from flask_wtf import CSRFProtect
+from flask_caching import Cache
 
+cache = Cache()
 app = Flask(__name__)
 crsf = CSRFProtect(app)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
@@ -43,6 +45,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'sh
 app.config['JWT_SECRET_KEY'] = 'asp-project-security-api'
 app.config['WTF_CSRF_ENABLED'] = True
 
+# app.config['CACHE_TYPE'] = 'simple'
+app.config["Cache-Control"] = "no-cache, no-store"
+app.config["Pragma"] = "no-cache"
+app.config['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config["CACHE_TYPE"] = "null"
+
+cache.init_app(app)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
 # SECRET_KEY = os.environ.get('SECRET_KEY') or "asp-project-security"
 
@@ -223,6 +233,17 @@ def before_request():
         g.user = session['user']
         # session.permant = True
         # app.permanent_session_lifetime = timedelta(minutes=1)
+
+
+@app.after_request
+def after_request(r):
+    r.headers["Cache-Control"] = "no-cache, no-store"
+    r.headers["Pragma"] = "no-cache"
+    r.headers['server'] = 'www.cbshop.com'
+    # r.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    return r
+
+
 
 
 @app.route('/dropsession')
