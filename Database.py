@@ -174,9 +174,9 @@ class User(db.Model):
 
 
 class UserSchema(ma.Schema):
-    """user Schema for api use."""
     class Meta:
         fields = ('id', 'username', 'email', 'password', 'is_authenticated', 'is_active', 'urole')
+        """user Schema for api use."""
 
 
 class Payment(db.Model):
