@@ -139,6 +139,7 @@ class User(db.Model):
 
     def __init__(self, public_id ,username, password, email, security_questions, security_questions_answer, is_active,
                  is_authenticated, is_admin):
+        """Initial the user columns"""
         self.public_id = public_id
         self.username = username
         self.password = password
@@ -149,18 +150,6 @@ class User(db.Model):
         self.is_authenticated = is_authenticated
         self.is_admin = is_admin
 
-    # def decrypt_username(self, username_input, database_input):
-    #     cipher_suite = Fernet(key)
-    #     result = cipher_suite.decrypt(database_input, ttl=None).decode("utf-8")
-    #     if result == username_input:
-    #         return True
-    #     else:
-    #         return False
-    # def encrypt_username(self, username_input):
-    #     cipher_suite = Fernet(key)
-    #     result = cipher_suite.encrypt(bytes(username_input, 'utf-8'))
-    #     # return result.decode("utf-8")
-    #     return result
 
     def is_authenticate(self):
         return self.is_authenticated
@@ -186,8 +175,7 @@ class User(db.Model):
 
 class UserSchema(ma.Schema):
     class Meta:
-        """user Schema for api use
-        """
+        """user Schema for api use"""
         fields = ('id', 'username', 'email', 'password', 'is_authenticated', 'is_active', 'urole')
 
 

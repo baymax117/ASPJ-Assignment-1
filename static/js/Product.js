@@ -33,7 +33,7 @@ $(document).ready(function(){
                     }
                 }
             }
-        };
+        }
     });
 
     // hide overlay when overlay is clicked

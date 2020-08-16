@@ -1,6 +1,6 @@
-from flask import Blueprint, request, redirect, url_for, current_app
+from flask import Blueprint, request, redirect, url_for
 from flask_login import current_user
-from Database import db, update_js, Cart
+from Database import db, Cart
 cart_api = Blueprint('cart_api', __name__)
 
 

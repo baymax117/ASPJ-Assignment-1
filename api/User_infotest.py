@@ -1,9 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app
-from Database import *
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token
+from Database import UserSchema, User
 from functools import wraps
 import jwt
-from werkzeug.exceptions import BadRequest
 
 
 user_schema = UserSchema()  #expect 1 record back

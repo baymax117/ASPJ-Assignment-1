@@ -1,11 +1,8 @@
-from flask import Flask, Blueprint, request, jsonify, make_response, current_app
+from flask import Blueprint, request, jsonify, make_response, current_app
 from Database import *
-# from flask_jwt_extended import JWTManager, jwt_required, create_access_token
-from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import jwt
 import bcrypt
-from werkzeug.exceptions import BadRequest
 
 
 login_api = Blueprint('login_api', __name__)

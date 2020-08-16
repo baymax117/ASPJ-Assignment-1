@@ -6,7 +6,7 @@ conn = sqlite3.connect(db)
 c = conn.cursor()
 def add(table,*args):
     statement="INSERT INTO %s VALUES %s" % (table,args)
-    cursor.execute(statement)
+    c.execute(statement)
 print("Without Hack: \n")
 
 c.execute("SELECT * from students WHERE Name='Robert'")
@@ -17,7 +17,6 @@ Name_to_use = (Name,)
 print("Name to use:", Name_to_use)
 
 
-use: ("Robert'; DROP TABLE students;--",)
 c.execute("SELECT * from students WHERE Name=(?)" , Name_to_use)
 data = [("Robert'; DROP TABLE students;--", 10)]
 c.executemany("INSERT INTO students VALUES (?,?)", data)

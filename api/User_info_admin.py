@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
-from Database import *
+from Database import UserSchema, User, db
 import jwt
 import uuid
 from functools import wraps
