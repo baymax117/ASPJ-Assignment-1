@@ -174,8 +174,8 @@ class User(db.Model):
 
 
 class UserSchema(ma.Schema):
+    """user Schema for api use."""
     class Meta:
-        """user Schema for api use."""
         fields = ('id', 'username', 'email', 'password', 'is_authenticated', 'is_active', 'urole')
 
 
