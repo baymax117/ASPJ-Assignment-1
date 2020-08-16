@@ -19,7 +19,7 @@ $(document).ready(function(){
             if (data[parseInt(product)][parseInt(1)] === item){
                 $("#item-details").html("<span>" + data[parseInt(product)][parseInt(1)] + "</span><br><span>" + data[parseInt(product)][parseInt(2)] + "</span><br><span>Price: $" + data[parseInt(product)][parseInt(3)].toFixed(2) + "</span>");
                 $("#item-desc").text(data[parseInt(product)][parseInt(4)]);
-                if (data[parseInt(product)][parseInt(4)] != null){
+                if (data[parseInt(product)][parseInt(4)] !== null){
                     $("#item-image").attr("src", "../static/img/" + data[parseInt(product)][parseInt(5)]);
                 }
                 else{

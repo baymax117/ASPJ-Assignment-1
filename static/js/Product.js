@@ -21,13 +21,13 @@ $(document).ready(function(){
                 $("#item-desc").text(data[parseInt(product)][parseInt(4)]);
                 $("#form-review").attr("action", "/api/Reviews/add/" + data[parseInt(product)][parseInt(0)]);
                 $(".add-cart").attr("action", "/api/Cart/add_cart/" + data[parseInt(product)][parseInt(0)]);
-                if (data[parseInt(product)][parseInt(4)] != null){
+                if (data[parseInt(product)][parseInt(4)] !== null){
                     $("#item-image").attr("src", "../static/img/" + data[parseInt(product)][parseInt(5)]);
                 }
                 else{
                     $("#item-image").attr("src", "../static/img/None.png");
                 }
-                for (entry in reviews){
+                for (var entry in reviews){
                     if (reviews[parseInt(entry)][parseInt(0)] === data[parseInt(product)][parseInt(0)]){
                         $(".reviews").text($(".reviews").text() + reviews[parseInt(entry)][parseInt(1)] + ": " + reviews[parseInt(entry)][parseInt(2)] + "\n");
                     }
