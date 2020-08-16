@@ -28,7 +28,7 @@ $(document).ready(function(){
                 for (var entry in reviews){
                     if (reviews[parseInt(entry)][parseInt(0)] === data[parseInt(product)][parseInt(0)]){
                         $(".reviews").text($(".reviews").text() + reviews[parseInt(entry)][parseInt(1)] + ": " + reviews[parseInt(entry)][parseInt(2)] + "\n");
-                    };
+                    }
                 };
             };
         };
@@ -54,4 +54,4 @@ $(document).ready(function(){
 
     $("#form-review").attr("action", "/login");
     $(".add-cart").attr("action", "/login");
-})
+});
