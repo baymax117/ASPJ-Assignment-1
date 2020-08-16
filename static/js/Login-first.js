@@ -16,18 +16,18 @@ $(document).ready(function(){
         var item = $(this).attr("id");
         $(".overlay").show();
         for (var product in data){
-            if (data[parseInt(product)][parseInt(1)] === item){
-                $("#item-details").html("<span>" + data[parseInt(product)][parseInt(1)] + "</span><br><span>" + data[parseInt(product)][parseInt(2)] + "</span><br><span>Price: $" + data[parseInt(product)][parseInt(3)].toFixed(2) + "</span>");
-                $("#item-desc").text(data[parseInt(product)][parseInt(4)]);
-                if (data[parseInt(product)][parseInt(4)] !== null){
-                    $("#item-image").attr("src", "../static/img/" + data[parseInt(product)][parseInt(5)]);
+            if (data[parseInt(product, 10)][parseInt(1, 10)] === item){
+                $("#item-details").html("<span>" + data[parseInt(product, 10)][parseInt(1, 10)] + "</span><br><span>" + data[parseInt(product, 10)][parseInt(2, 10)] + "</span><br><span>Price: $" + data[parseInt(product, 10)][parseInt(3, 10)].toFixed(2) + "</span>");
+                $("#item-desc").text(data[parseInt(product, 10)][parseInt(4, 10)]);
+                if (data[parseInt(product, 10)][parseInt(4, 10)] !== null){
+                    $("#item-image").attr("src", "../static/img/" + data[parseInt(product, 10)][parseInt(5, 10)]);
                 }
                 else{
                     $("#item-image").attr("src", "../static/img/None.png");
                 }
                 for (var entry in reviews){
-                    if (reviews[parseInt(entry)][parseInt(0)] === data[parseInt(product)][parseInt(0)]){
-                        $(".reviews").text($(".reviews").text() + reviews[parseInt(entry)][parseInt(1)] + ": " + reviews[parseInt(entry)][parseInt(2)] + "\n");
+                    if (reviews[parseInt(entry, 10)][parseInt(0, 10)] === data[parseInt(product, 10)][parseInt(0, 10)]){
+                        $(".reviews").text($(".reviews").text() + reviews[parseInt(entry, 10)][parseInt(1, 10)] + ": " + reviews[parseInt(entry, 10)][parseInt(2, 10)] + "\n");
                     }
                 };
             };
