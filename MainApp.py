@@ -134,7 +134,6 @@ def search():
         for row in results:
             cart_no += 1
     if request.args.get('q') == '':
-        print('redirected')
         return redirect(url_for('home'))
     else:
         query = request.args.get('q')
@@ -155,16 +154,6 @@ def getallusersrecords():
     users_list = User.query.all()
     result = users_schema.dump(users_list)
     return jsonify(result)
-
-
-# @app.route('/protected_testing/<username>')
-# def protected(username):
-#     print("Inside Protected")
-#     if g.user:
-#         print("Login good")
-#         return render_template('protected_testing.html', user=session['user'])
-#     print("Login Bad")
-#     return redirect(url_for('home'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -196,8 +185,6 @@ def login():
             if bcrypt.checkpw(form.password.data.encode(), user.password):
                 login_user(user, remember=form.remember_me.data)
                 user.activate_is_authenticated()
-                print(user.is_authenticated)
-                print("hey", current_user.is_authenticated)
                 db.session.add(user)
                 db.session.commit()
                 session['user'] = request.form['username']
@@ -220,8 +207,6 @@ def logout():
     if current_user.is_anonymous:
         return redirect(url_for('login'))
     user = current_user
-    # print("name",current_user.username)
-    # print("not login out yet", current_user.is_authenticate())
     user.deactivate_is_authenticated()
     db.session.add(user)
     db.session.commit()
@@ -294,8 +279,6 @@ def forgotpassword():
         # ---sha algorithm---
         if email_exist is not None:
             user = User.query.filter_by(email=hashed_email_data).first()
-            print("Here")
-
             form11 = ForgetPasswordForm_Security()
             if form11.validate_on_submit():
                 if bcrypt.checkpw(form11.security_questions.data.encode(), user.security_questions):
@@ -344,10 +327,8 @@ def cart():
     cart_list = []
     total_price = 0
     if current_user is None:
-        print("Yo here man")
         user = None
     else:
-        print("Yo, it is here")
         user = current_user
         statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
         results = db.engine.execute(statement)
@@ -419,8 +400,6 @@ def payment():
 
                     db.session.add(card)
                     db.session.commit()
-                    print("Yo2")
-                    print('Payment successful')
                     while True:
                         product = Cart.query.filter_by(cart_id=current_user.id).first()
                         if product is None:
@@ -452,8 +431,6 @@ def payment():
 
             db.session.add(card)
             db.session.commit()
-            print("Yo")
-            print('Payment successful')
             while True:
                 product = Cart.query.filter_by(cart_id=current_user.id).first()
                 if product is None:
