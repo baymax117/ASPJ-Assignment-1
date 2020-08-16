@@ -51,8 +51,6 @@ app.config["CACHE_TYPE"] = "null"
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 cache.init_app(app)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
-# SECRET_KEY = os.environ.get('SECRET_KEY') or "asp-project-security"
 
 app.config['SECRET_KEY'] = "asp-project-security"
 
@@ -64,12 +62,6 @@ jwtt = JWTManager(app)
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-# login_manager.anonymous_user = Anonymous
-
-# login_manager.refresh_view = 'relogin'
-# login_manager.needs_refresh_message = (u"Session timedout, please re-login")
-# login_manager.needs_refresh_message_category = 'info'
-
 user_schema = UserSchema()  # expect 1 record back
 users_schema = UserSchema(many=True)  # expect multiple record back
 
@@ -229,8 +221,6 @@ def before_request():
     g.user = None
     if 'user' in session:
         g.user = session['user']
-        # session.permant = True
-        # app.permanent_session_lifetime = timedelta(minutes=1)
 
 
 @app.after_request
@@ -250,7 +240,6 @@ def after_request(r):
 def dropsession():
     session.pop('user', None)
     return redirect(url_for("home"))
-    # return render_template('home.html')
 
 
 # -----------------------------------------------------------------------
@@ -350,18 +339,8 @@ def login():
             flash("Too many unsuccessful attempts, please try again later!")
             return redirect(url_for('login'))
 
-
-        # input_username = form.username.data #
-        # result = encrypt_username(input_username) #
-        # print(result)
-
-        # user = User.query.filter_by(username=result).first()
-        # hashed_username_data = hashlib.sha256(form.username.data.encode()).hexdigest()
         user = User.query.filter_by(username=form.username.data).first()
-
-        # if user is None or not user.check_password(form.password.data):
         if user:
-            # if check_password_hash(user.password, form.password.data):
             if bcrypt.checkpw(form.password.data.encode(), user.password):
                 login_user(user, remember=form.remember_me.data)
                 user.activate_is_authenticated()
@@ -386,29 +365,16 @@ def login():
 
 @app.route('/logout')
 def logout():
-    # if current_user == Anonymous:
-    #     user = Anonymous
-    #     return redirect(url_for('login'))
-    # else:
     if current_user.is_anonymous:
         return redirect(url_for('login'))
-
-    print("here 1", current_user == None)
-    print("here", current_user)
     user = current_user
-    print("id", user.id)
     # print("name",current_user.username)
     # print("not login out yet", current_user.is_authenticate())
     user.deactivate_is_authenticated()
     db.session.add(user)
     db.session.commit()
-    # print("login out le",current_user.is_authenticate())
     logout_user()
     return redirect(url_for("home"))
-
-    # if Anonymous:
-    #     return redirect(url_for('login'))
-    # else:
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -418,15 +384,6 @@ def signup():
 
     form = CreateUserForm()
     if form.validate_on_submit():
-
-        # hashed_username_data = hashlib.sha256(form.username.data.encode()).hexdigest()
-
-        # --Plaintext---
-        # exists = db.session.query(User.id).filter_by(email=form.email.data).scalar()
-        # exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
-        # --Plaintext---
-
-        # --sha512---
         # email
         hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
         exists = False
@@ -447,41 +404,17 @@ def signup():
             count += 1
         if count >= 1:
             exists2 = True
-        # --sha512---
-
-        # bcrypt
-        # hashed_email_data = bcrypt.hashpw(form.email.data.encode(), bcrypt.gensalt())
-        # exists = db.session.query(User.id).filter_by(email=hashed_email_data).scalar()
-        # exists2 = db.session.query(User.id).filter_by(username=form.username.data).scalar()
-        # bcrypt
-
         if not exists and not exists2:
-            # ---sha algorithm----
-            # hashed_password = generate_password_hash(form.password.data, method='sha512') #with salt
-            # hashed_security_Q = generate_password_hash(form.security_questions.data, method='sha1') #with salt
-            # hashed_security_ans = generate_password_hash(form.security_questions_answer.data, method='sha512') #with salt
-            # ---sha algorithm----
-
             # bcrypt
             hashed_password = bcrypt.hashpw(form.password.data.encode(), bcrypt.gensalt(rounds=16))
             hashed_security_Q = bcrypt.hashpw(form.security_questions.data.encode(), bcrypt.gensalt())
             hashed_security_ans = bcrypt.hashpw(form.security_questions_answer.data.encode(), bcrypt.gensalt())
             # bcrypt
-
-            # password=form.password.data
             newuser = User(public_id=str(uuid.uuid4()), username=form.username.data, email=hashed_email_data,
                            password=hashed_password,
                            security_questions=hashed_security_Q,
                            security_questions_answer=hashed_security_ans,
                            is_active=True, is_authenticated=False, is_admin=False)
-            # newuser = User(public_id=str(uuid.uuid4()),username=form.username.data, email=form.email.data, password=hashed_password,
-            #                security_questions=form.security_questions.data,
-            #                security_questions_answer=form.security_questions_answer.data,
-            #                is_active=True, is_authenticated=False, is_admin=False)
-
-            # Role.create('customer')
-            # newuser.roles.append(Role(name='customer', id=2))
-            # newuser.set_password(form.password.data)
             db.session.add(newuser)
             db.session.commit()
             flash("You have successfully signed up!")
@@ -501,67 +434,33 @@ def forgotpassword():
         return redirect(url_for('home'))
 
     form1 = ForgetPasswordForm_Email()
-    # form11 = ForgetPasswordForm_Security()
-    # form2 = ForgetPasswordForm()
     if form1.validate_on_submit():
 
         # ---sha algorithm---
         hashed_email_data = hashlib.sha256(form1.email.data.encode()).hexdigest()
         email_exist = db.session.query(User.id).filter_by(email=hashed_email_data).scalar()
         # ---sha algorithm---
-        # hashed_email_data = bcrypt.hashpw(form1.email.data.encode(), bcrypt.gensalt())
-        # email_exist = db.session.query(User.id).filter_by(email=hashed_email_data).scalar()
-
         if email_exist is not None:
             user = User.query.filter_by(email=hashed_email_data).first()
-            # form11 = ForgetPasswordForm_Security()
             print("Here")
 
             form11 = ForgetPasswordForm_Security()
             if form11.validate_on_submit():
-                print('Here 2')
-                # if check_password_hash(user.security_questions, form11.security_questions.data):
                 if bcrypt.checkpw(form11.security_questions.data.encode(), user.security_questions):
-                    print('Here 3')
-                    # if check_password_hash(user.security_questions_answer, form11.security_questions_answer.data):
                     if bcrypt.checkpw(form11.security_questions_answer.data.encode(), user.security_questions_answer):
                         form2 = ForgetPasswordForm()
-                        # user = User.query.filter_by(email=hashed_email_data).first()
-
-                        # security_questions = user.security_questions
-                        print("Checkpoint ok")
                         if form2.validate_on_submit():
-                            # if user.security_questions_answer == form2.security_questions_answer.data:
-                            # if check_password_hash(user.security_questions_answer, form2.security_questions_answer.data):
-                            print('REACHED')
                             update_user = User.query.filter_by(email=hashed_email_data).first()
-
-                            # ---Sha algorithm---
-                            # hashed_password = generate_password_hash(form2.newpassword.data, method='sha512')
-                            # update_user.password = hashed_password
-                            # ---Sha algorithm---
-
                             hashed_password = bcrypt.hashpw(form2.newpassword.data.encode(), bcrypt.gensalt(rounds=16))
-
                             update_user.password = hashed_password
                             db.session.commit()
                             flash("You have successfully reset your password")
                             return redirect(url_for('login'))
-
                         return render_template('forgot_password.html', title='Reset Password', form1=form1,
                                                form11=form11, form2=form2)
                     else:
-                        print("OH NO")
                         flash("Incorrect security questions answer")
                         return redirect(url_for('forgotpassword'))
-                # else:
-                #     flash('Email does not exist')
-                #     return redirect((url_for('forgotpassword')))
-                # return render_template('forgot_password.html', title='Reset Password', form1=form1, form11=form11, form2=form2)
-            # else:
-            #     flash('Email does not exist')
-            #     return redirect((url_for('forgotpassword')))
-
             return render_template('forgot_password.html', title='Reset Password', form1=form1, form11=form11)
 
         else:
@@ -617,55 +516,25 @@ def payment():
         user = None
     else:
         user = current_user
-    # cardlist = []
-    # statement = text('SELECT * FROM cards WHERE id = {}'.format(current_user.id))
-    # results = db.engine.execute(statement)
-    # print(results)
-    # for row in results:
-    #     remember = Payment.query.filter_by(rememberinfo=True).first()
-    #     print(remember)
-    #     # card = Payment.query.filter_by(cardnum=row[1]).first()
-    #     #print(row)
-    #     cardlist.append(row)
-
     cardlist = []
     form = PaymentForm()
     if request.method == 'POST':
-        # print(request.form.getlist('Remember_info'))
-        # if form.validate_on_submit() and request.form.getlist('Remember_info') == ['Remember_info']:
         if form.validate_on_submit():
-            print("PATH 1 ")  # Card exist in the database
-            # exist_cardnum = db.session.query(Payment.cardnum).filter_by(cardnum=form.cardNum.data).first()
-            # print(exist_cardnum)
-
-            print('current user id', current_user.id)
-
             statement = text('SELECT * FROM cards WHERE id = {}'.format(current_user.id))
             results = db.engine.execute(statement)
             for row in results:
                 cards_num = row.cardnum
                 cardlist.append(cards_num)
-
             user_card_exist = db.session.query(Payment).filter_by(id=current_user.id).first()
-            print(user_card_exist)
-
-            # if exist_cardnum:
-            # if bcrypt.checkpw(form.cardNum.data, user_card.cardname):
             if user_card_exist:
                 result = False
-
                 for cardnum in cardlist:
-                    print('HEREERERERERERERER')
-                    print(cardnum)
                     if bcrypt.checkpw(str(form.cardNum.data).encode(), cardnum):
                         result = True
                         break
                     else:
                         continue
-                # if bcrypt.checkpw(str(form.cardNum.data).encode(), user_card_exist.cardnum):
-                if result == True:
-                    print("PATH 1.1 ")
-                    print('Payment successful')
+                if result:
                     while True:
                         product = Cart.query.filter_by(cart_id=current_user.id).first()
                         if product is None:
@@ -696,18 +565,6 @@ def payment():
                                    cvv=hashed_cvv,
                                    id=user.get_id())
 
-                    # card = Payment(name=form.name.data,
-                    #        email=form.email.data,
-                    #        address=form.address.data,
-                    #        country=form.country.data,
-                    #        city=form.city.data,
-                    #        zip=form.zip.data,
-                    #        cardname=form.cardName.data,
-                    #        cardnum=form.cardNum.data,
-                    #        expmonth=form.expmonth.data,
-                    #        expyear=form.expyear.data,
-                    #        cvv=form.cvv.data,
-                    #        id=user.get_id())
                     db.session.add(card)
                     db.session.commit()
                     print("Yo2")
@@ -720,11 +577,6 @@ def payment():
                             db.session.delete(product)
                             db.session.commit()
                     return redirect(url_for('home'))
-
-            # print(request.form.getlist('Remember_info'))
-
-            # print("PATH 1.2 ") #When card does not exist in the database
-            # print(bcrypt.checkpw(form.cardNum.data.encode(), user.cardname))
 
             hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
             hashed_cardname = bcrypt.hashpw(form.cardName.data.encode(), bcrypt.gensalt())
@@ -746,18 +598,6 @@ def payment():
                            cvv=hashed_cvv,
                            id=user.get_id())
 
-            # card = Payment(name=form.name.data,
-            #                email=form.email.data,
-            #                address=form.address.data,
-            #                country=form.country.data,
-            #                city=form.city.data,
-            #                zip=form.zip.data,
-            #                cardname=form.cardName.data, #show
-            #                cardnum=form.cardNum.data, #last 4
-            #                expmonth=form.expmonth.data, #show
-            #                expyear=form.expyear.data, #show
-            #                cvv=form.cvv.data,
-            #                id=user.get_id())
             db.session.add(card)
             db.session.commit()
             print("Yo")
@@ -770,52 +610,6 @@ def payment():
                     db.session.delete(product)
                     db.session.commit()
             return redirect(url_for('home'))
-
-        # if form.validate_on_submit() and request.form.getlist('Remember_info') == []:
-        #     print("PATH 2 ")
-        #     exist_cardnum = db.session.query(Payment.cardnum).filter_by(cardnum=form.cardNum.data).first()
-        #     print(exist_cardnum)
-        #     if exist_cardnum:
-        #         print("PATH 2.1 ")
-        #         print('Payment successful')
-        #         while True:
-        #             product = Cart.query.filter_by(cart_id=current_user.id).first()
-        #             if product is None:
-        #                 break
-        #             else:
-        #                 db.session.delete(product)
-        #                 db.session.commit()
-        #         return redirect(url_for('home'))
-        #
-        #     print("PATH 2.2 ")
-        #     card = Payment(name=form.name.data,
-        #                    email=form.email.data,
-        #                    address=form.address.data,
-        #                    country=form.country.data,
-        #                    city=form.city.data,
-        #                    zip=form.zip.data,
-        #                    cardname=form.cardName.data,
-        #                    cardnum=form.cardNum.data,
-        #                    expmonth=form.expmonth.data,
-        #                    expyear=form.expyear.data,
-        #                    cvv=form.cvv.data,
-        #                    id=user.get_id(),
-        #                    rememberinfo=False)
-        #     db.session.add(card)
-        #     db.session.commit()
-        #     print("Yo2")
-        #     print('Payment successful')
-        #     while True:
-        #         product = Cart.query.filter_by(cart_id=current_user.id).first()
-        #         if product is None:
-        #             break
-        #         else:
-        #             db.session.delete(product)
-        #             db.session.commit()
-        #     return redirect(url_for('home'))
-        #
-        # else:
-        #     return redirect(url_for('payment'))
 
     return render_template('payment.html', title='Payment', form=form, user=user)
 
