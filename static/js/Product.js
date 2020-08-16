@@ -29,8 +29,8 @@ $(document).ready(function(){
                 }
                 for (entry in reviews){
                     if (reviews[parseInt(entry)][parseInt(0)] === data[parseInt(product)][parseInt(0)]){
-                        $(".reviews").text($(".reviews").text() + reviews[parseInt(entry)][parseInt(1)] + ": " + reviews[parseInt(entry)][parseInt(2)] + "\n")
-                    };
+                        $(".reviews").text($(".reviews").text() + reviews[parseInt(entry)][parseInt(1)] + ": " + reviews[parseInt(entry)][parseInt(2)] + "\n");
+                    }
                 };
             };
         };
@@ -44,7 +44,7 @@ $(document).ready(function(){
             $("#form-review").attr("action", "");
             $(".add-cart").attr("action", "");
             $("#item-image").attr("src", "../static/img/None.png");
-            $(".overlay-item").data("clicked", false)
+            $(".overlay-item").data("clicked", false);
             $(".reviews").html("");
             }
         else{
@@ -57,4 +57,4 @@ $(document).ready(function(){
     });
 
 
-})
+});

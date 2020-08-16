@@ -24,10 +24,10 @@ $(document).ready(function(){
                 }
                 else{
                     $("#item-image").attr("src", "../static/img/None.png");
-                };
-                for (entry in reviews){
+                }
+                for (var entry in reviews){
                     if (reviews[parseInt(entry)][parseInt(0)] === data[parseInt(product)][parseInt(0)]){
-                        $(".reviews").text($(".reviews").text() + reviews[parseInt(entry)][parseInt(1)] + ": " + reviews[parseInt(entry)][parseInt(2)] + "\n")
+                        $(".reviews").text($(".reviews").text() + reviews[parseInt(entry)][parseInt(1)] + ": " + reviews[parseInt(entry)][parseInt(2)] + "\n");
                     };
                 };
             };
