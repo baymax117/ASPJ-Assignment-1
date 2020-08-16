@@ -15,7 +15,7 @@ $(document).ready(function(){
     $(".item-container").on("click", function(){
         var item = $(this).attr("id");
         $(".overlay").show();
-        for (product in data){
+        for (var product in data){
             if (data[parseInt(product)][parseInt(1)] == item){
                 $("#item-details").html("<span>" + data[parseInt(product)][parseInt(1)] + "</span><br><span>" + data[parseInt(product)][parseInt(2)] + "</span><br><span>Price: $" + data[parseInt(product)][parseInt(3)].toFixed(2) + "</span>");
                 $("#item-desc").text(data[parseInt(product)][parseInt(4)]);
