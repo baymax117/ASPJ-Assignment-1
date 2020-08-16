@@ -32,7 +32,7 @@ $(document).ready(function(){
                         $(".reviews").text($(".reviews").text() + reviews[parseInt(entry, 10)][parseInt(1, 10)] + ": " + reviews[parseInt(entry, 10)][parseInt(2, 10)] + "\n");
                     }
                 }
-            };
+            }
         };
     });
 

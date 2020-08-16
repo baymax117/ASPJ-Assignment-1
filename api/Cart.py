@@ -1,7 +1,5 @@
 from flask import Blueprint, request, redirect, url_for, current_app
 from flask_login import current_user
-from Database import Reviews
-from sqlalchemy.sql import text
 from Database import db, update_js, Cart
 cart_api = Blueprint('cart_api', __name__)
 

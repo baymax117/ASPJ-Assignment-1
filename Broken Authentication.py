@@ -11,10 +11,6 @@ for p in passwords:
     print(''.join(p))
 import mechanize
 
-from itertools import combinations
-
-from string import ascii_lowercase
-
 url = "http://127.0.0.1:5000/login"
 
 browser = mechanize.Browser()
