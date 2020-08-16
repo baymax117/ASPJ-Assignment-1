@@ -1,12 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, sql, Boolean, ForeignKey, log , Unicode
+from sqlalchemy import Column, Integer, String, Float, sql, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 import json
 from flask_marshmallow import Marshmallow
-#---New---
-
-#---New---
-
 
 
 db = SQLAlchemy()
@@ -264,8 +260,8 @@ def update_js():
     print(data2)
 
     js = open("static/js/Shop.js", 'w')
-    js.write("function CreateList(){var data = " + "{data}".format(
-        data=data1) + ";return data}" + "function CreateReview(){var reviews = " + "{data}".format(
+    js.write("function createList(){var data = " + "{data}".format(
+        data=data1) + ";return data}" + "function createReview(){var reviews = " + "{data}".format(
         data=data2) + "; return reviews}")
     print('js updated')
     js.close()

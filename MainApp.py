@@ -4,7 +4,7 @@ from flask_login import LoginManager, logout_user, current_user, login_user, Use
 from functools import wraps
 from sqlalchemy.sql import text
 from uuid import uuid4
-from Database import *
+from Database import db, User, UserSchema, Product, Payment, Cart, db_create, db_drop, db_seed, update_js
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import os

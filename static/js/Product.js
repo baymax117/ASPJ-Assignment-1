@@ -1,5 +1,5 @@
-var data = CreateList()
-var reviews = CreateReview()
+var data = createList();
+var reviews = createReview();
 $(document).ready(function(){
     // "pop up" item when mouse enters the box
     $(".item-container").on("mouseenter", function(){
@@ -16,7 +16,7 @@ $(document).ready(function(){
         var item = $(this).attr("id");
         $(".overlay").show();
         for (var product in data){
-            if (data[parseInt(product)][parseInt(1)] == item){
+            if (data[parseInt(product)][parseInt(1)] === item){
                 $("#item-details").html("<span>" + data[parseInt(product)][parseInt(1)] + "</span><br><span>" + data[parseInt(product)][parseInt(2)] + "</span><br><span>Price: $" + data[parseInt(product)][parseInt(3)].toFixed(2) + "</span>");
                 $("#item-desc").text(data[parseInt(product)][parseInt(4)]);
                 $("#form-review").attr("action", "/api/Reviews/add/" + data[parseInt(product)][parseInt(0)]);
@@ -28,7 +28,7 @@ $(document).ready(function(){
                     $("#item-image").attr("src", "../static/img/None.png");
                 }
                 for (entry in reviews){
-                    if (reviews[parseInt(entry)][parseInt(0)] == data[parseInt(product)][parseInt(0)]){
+                    if (reviews[parseInt(entry)][parseInt(0)] === data[parseInt(product)][parseInt(0)]){
                         $(".reviews").text($(".reviews").text() + reviews[parseInt(entry)][parseInt(1)] + ": " + reviews[parseInt(entry)][parseInt(2)] + "\n")
                     };
                 };
