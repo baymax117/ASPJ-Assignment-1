@@ -13,11 +13,11 @@ def add(product_id):
         if current_user is not None:
             statement = text("SELECT review_id FROM reviews")
             result = db.engine.execute(statement)
-            max = 1
+            maxi = 1
             for row in result:
-                if row[0] >= max:
-                    max = row[0] + 1
-            review = Reviews(review_id=max,
+                if row[0] >= maxi:
+                    maxi = row[0] + 1
+            review = Reviews(review_id=maxi,
                              id=current_user.id,
                              product_id=product_id,
                              review=request.form['comment'])

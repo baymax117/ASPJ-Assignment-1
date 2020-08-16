@@ -1,11 +1,8 @@
 from flask import Blueprint, request, jsonify, current_app
 from Database import *
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import jwt
 import uuid
-from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from flask_login import LoginManager, logout_user, current_user, login_user, UserMixin
 import hashlib
 import bcrypt
 from werkzeug.exceptions import BadRequest
