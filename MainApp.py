@@ -51,6 +51,7 @@ app.config["Pragma"] = "no-cache"
 app.config['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config["CACHE_TYPE"] = "null"
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 cache.init_app(app)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
@@ -240,7 +241,9 @@ def after_request(r):
     r.headers["Cache-Control"] = "no-cache, no-store"
     r.headers["Pragma"] = "no-cache"
     r.headers['server'] = 'www.cbshop.com'
-    # r.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    r.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    r.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    r.headers['X-XSS-Protection'] = '1; mode=block'
     return r
 
 
