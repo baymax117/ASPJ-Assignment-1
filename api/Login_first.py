@@ -6,9 +6,6 @@ import bcrypt
 
 
 login_api = Blueprint('login_api', __name__)
-# app.config['SECRET_KEY'] = "asp-project-security"
-# app = Flask(__name__)
-
 
 
 @login_api.route('/apilogin')

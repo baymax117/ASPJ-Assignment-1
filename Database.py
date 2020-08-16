@@ -139,7 +139,6 @@ class User(db.Model):
 
     def __init__(self, public_id ,username, password, email, security_questions, security_questions_answer, is_active,
                  is_authenticated, is_admin):
-
         """Initial the user columns."""
 
         self.public_id = public_id
@@ -177,7 +176,6 @@ class User(db.Model):
 
 class UserSchema(ma.Schema):
     class Meta:
-
         """user Schema for api use."""
 
         fields = ('id', 'username', 'email', 'password', 'is_authenticated', 'is_active', 'urole')
