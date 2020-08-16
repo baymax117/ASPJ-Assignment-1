@@ -16,18 +16,18 @@ $(document).ready(function(){
         var item = $(this).attr("id");
         $(".overlay").show();
         for (product in data){
-            if (data[product][parseInt(1)] == item){
-                $("#item-details").html("<span>" + data[product][parseInt(1)] + "</span><br><span>" + data[product][parseInt(2)] + "</span><br><span>Price: $" + data[product][parseInt(3)].toFixed(2) + "</span>");
-                $("#item-desc").text(data[product][parseInt(4)]);
-                if (data[product][parseInt(4)] != null){
-                    $("#item-image").attr("src", "../static/img/" + data[product][parseInt(5)]);
+            if (data[parseInt(product)][parseInt(1)] == item){
+                $("#item-details").html("<span>" + data[parseInt(product)][parseInt(1)] + "</span><br><span>" + data[parseInt(product)][parseInt(2)] + "</span><br><span>Price: $" + data[parseInt(product)][parseInt(3)].toFixed(2) + "</span>");
+                $("#item-desc").text(data[parseInt(product)][parseInt(4)]);
+                if (data[parseInt(product)][parseInt(4)] != null){
+                    $("#item-image").attr("src", "../static/img/" + data[parseInt(product)][parseInt(5)]);
                 }
                 else{
                     $("#item-image").attr("src", "../static/img/None.png");
                 };
                 for (entry in reviews){
-                    if (reviews[entry][parseInt(0)] == data[product][parseInt(0)]){
-                        $(".reviews").text($(".reviews").text() + reviews[entry][parseInt(1)] + ": " + reviews[entry][parseInt(2)] + "\n")
+                    if (reviews[parseInt(entry)][parseInt(0)] == data[parseInt(product)][parseInt(0)]){
+                        $(".reviews").text($(".reviews").text() + reviews[parseInt(entry)][parseInt(1)] + ": " + reviews[parseInt(entry)][parseInt(2)] + "\n")
                     };
                 };
             };
