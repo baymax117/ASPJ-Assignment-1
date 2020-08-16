@@ -40,8 +40,6 @@ for p in passwords:
 
     # Print  response code
 
-    print
-    res.code
 
     # Write response to file
 
@@ -54,5 +52,5 @@ for p in passwords:
     attackNumber += 1
     # check if we were taken back to the login page or not
 
-    if content.find(b'<input type="password" name="passwd" />') > 0:
+    if content.find(b'<input type="password" name="passwordd" />') > 0:
         print("Login failed")
