@@ -190,6 +190,8 @@ class User(db.Model):
 
 class UserSchema(ma.Schema):
     class Meta:
+        """user Schema for api use
+        """
         fields = ('id', 'username', 'email', 'password', 'is_authenticated', 'is_active', 'urole')
 
 
@@ -240,6 +242,7 @@ class OrderItems(db.Model):
     product_id = Column(Integer)
     quantity = Column(Integer)
 
+
 # to update the js file for the shop
 def update_js():
     statement = sql.text('SELECT * FROM products')
@@ -261,7 +264,7 @@ def update_js():
     print(data2)
 
     js = open("static/js/Shop.js", 'w')
-    js.write("function CreateList(){ var data = " + "{data}".format(
+    js.write("function CreateList(){var data = " + "{data}".format(
         data=data1) + ";return data}" + "function CreateReview(){var reviews = " + "{data}".format(
         data=data2) + "; return reviews}")
     print('js updated')
