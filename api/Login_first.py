@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, make_response, current_app
-from Database import *
+from Database import User
 import datetime
 import jwt
 import bcrypt
