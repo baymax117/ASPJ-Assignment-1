@@ -1,7 +1,6 @@
 from flask import Blueprint, request, redirect, url_for
 from flask_login import current_user
 from Database import User
-from sqlalchemy.sql import text
 from Database import db
 
 update_profile_api = Blueprint('update_profile_api', __name__)
