@@ -119,8 +119,8 @@ textarea{
                 <span>Description:</span>
                 <p id="item-desc"></p>
                 <form class="add-cart" method="post">
-                    <button class="btn btn-primary" type="submit">Add To Cart</button>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button class="btn btn-primary" type="submit">Add To Cart</button>
                 </form>
             </div>
             <div class="col">
@@ -135,6 +135,7 @@ textarea{
                 </div>
                 <div class="row input">
                     <form id="form-review" action="" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <textarea form="form-review" name="comment" style="height:200px; width:300px; resize: none"></textarea>
                         <br>
                         <button type="submit">Submit</button>
