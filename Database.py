@@ -248,8 +248,8 @@ def update_js():
     print(data2)
 
     js = open("static/js/Shop.js", 'w')
-    js.write("function createList(){var data = " + "{data}".format(
-        data=data1) + ";return data};" + "function createReview(){var reviews = " + "{data}".format(
-        data=data2) + "; return reviews};")
+    js.write("function createList(){\nvar data = " + "{data}".format(
+        data=data1) + "\nreturn data\n};" + "function createReview(){\nvar reviews = " + "{data}".format(
+        data=data2) + "\nreturn reviews\n};")
     print('js updated')
     js.close()
