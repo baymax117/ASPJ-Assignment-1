@@ -20,7 +20,7 @@ from flask_caching import Cache
 
 cache = Cache()
 app = Flask(__name__)
-crsf = CSRFProtect(app)
+csrf = CSRFProtect(app)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
 app.register_blueprint(update_profile_api, url_prefix='/api/update_profile')
@@ -47,9 +47,11 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['X-Content-Type-Options'] = 'nosniff'
 # app.config['SESSION_COOKIE_SECURE'] = True
 
-cache.init_app(app)
-
 app.config['SECRET_KEY'] = "asp-project-security"
+cache.init_app(app)
+csrf.init_app(app)
+
+
 
 db.app = app
 db.init_app(app)
