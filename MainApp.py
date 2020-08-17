@@ -338,6 +338,7 @@ def payment():
                         else:
                             db.session.delete(product)
                             db.session.commit()
+                    update_log(create_log(request.form['username'], request.remote_addr, 'payment'))
                     return redirect(url_for('home'))
                 else:
 
@@ -370,6 +371,7 @@ def payment():
                         else:
                             db.session.delete(product)
                             db.session.commit()
+                    update_log(create_log(request.form['username'], request.remote_addr, 'payment'))
                     return redirect(url_for('home'))
 
             hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
@@ -401,6 +403,7 @@ def payment():
                 else:
                     db.session.delete(product)
                     db.session.commit()
+            update_log(create_log(request.form['username'], request.remote_addr, 'payment'))
             return redirect(url_for('home'))
 
     return render_template('payment.html', title='Payment', form=form, user=user)
