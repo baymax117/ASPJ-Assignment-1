@@ -217,7 +217,7 @@ def signup():
             # bcrypt
             hashed_password = bcrypt.hashpw(form.password.data.encode(), bcrypt.gensalt(rounds=16))
             hashed_security_Q = bcrypt.hashpw(form.security_questions.data.encode(), bcrypt.gensalt())
-            hashed_security_ans = bcrypt.hashpw(form.security_questions_answer.data.encode(), bcrypt.gensalt())
+            hashed_security_ans = bcrypt.hashpw(form.security_questions_answer.data.encode(), bcrypt.gensalt(rounds=16))
             # bcrypt
             newuser = User(public_id=str(uuid.uuid4()), username=form.username.data, email=hashed_email_data,
                            password=hashed_password,
