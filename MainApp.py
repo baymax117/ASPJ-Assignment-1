@@ -35,12 +35,17 @@ app.config['JWT_SECRET_KEY'] = 'asp-project-security-api'
 # app.config['WTF_CSRF_ENABLED'] = True
 
 # app.config['CACHE_TYPE'] = 'simple'
-app.config["Cache-Control"] = "no-cache, no-store"
+
+app.config["Cache-Control"] = "no-cache, no-store, must-revalidate"
 app.config["Pragma"] = "no-cache"
+app.config['server'] = 'www.cbshop.com'
 app.config['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
 # app.config['SESSION_COOKIE_SECURE'] = True
 app.config["CACHE_TYPE"] = "null"
+app.config['X-Frame-Options'] = 'SAMEORIGIN'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['X-Content-Type-Options'] = 'nosniff'
+# app.config['SESSION_COOKIE_SECURE'] = True
 
 cache.init_app(app)
 
@@ -57,7 +62,7 @@ login_manager.login_view = 'login'
 user_schema = UserSchema()  # expect 1 record back
 users_schema = UserSchema(many=True)  # expect multiple record back
 
-SESSION_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
 
 
 @app.before_request
@@ -75,6 +80,7 @@ def after_request(r):
     r.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     r.headers['X-Frame-Options'] = 'SAMEORIGIN'
     r.headers['X-XSS-Protection'] = '1; mode=block'
+    r.headers['X-Content-Type-Options'] = 'nosniff'
     return r
 
 
@@ -86,8 +92,8 @@ def dropsession():
 
 # -----------------------------------------------------------------------
 @login_manager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 def get_cart_size(user):
