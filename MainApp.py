@@ -15,12 +15,12 @@ from api.update_profile import update_profile_api
 import uuid
 import hashlib
 import bcrypt
-from flask_wtf import CsrfProtect
+from flask_wtf import CSRFProtect
 from flask_caching import Cache
 
 cache = Cache()
 app = Flask(__name__)
-csrf = CsrfProtect(app)
+csrf = CSRFProtect(app)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
 app.register_blueprint(update_profile_api, url_prefix='/api/update_profile')
@@ -45,7 +45,6 @@ app.config["CACHE_TYPE"] = "null"
 app.config['X-Frame-Options'] = 'SAMEORIGIN'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['X-Content-Type-Options'] = 'nosniff'
-
 
 app.config['SECRET_KEY'] = "asp-project-security"
 cache.init_app(app)
@@ -217,7 +216,7 @@ def signup():
             # bcrypt
             hashed_password = bcrypt.hashpw(form.password.data.encode(), bcrypt.gensalt(rounds=16))
             hashed_security_Q = bcrypt.hashpw(form.security_questions.data.encode(), bcrypt.gensalt())
-            hashed_security_ans = bcrypt.hashpw(form.security_questions_answer.data.encode(), bcrypt.gensalt())
+            hashed_security_ans = bcrypt.hashpw(form.security_questions_answer.data.encode(), bcrypt.gensalt(rounds=16))
             # bcrypt
             newuser = User(public_id=str(uuid.uuid4()), username=form.username.data, email=hashed_email_data,
                            password=hashed_password,
@@ -320,7 +319,7 @@ def payment():
         if form.validate_on_submit():
             cards = Payment.query.filter_by(id=current_user.id).all()
             for card in cards:
-                cardlist.append(card.card_num)
+                cardlist.append(card.cardnum)
             user_card_exist = db.session.query(Payment).filter_by(id=current_user.id).first()
             if user_card_exist:
                 result = False
@@ -338,7 +337,7 @@ def payment():
                         else:
                             db.session.delete(product)
                             db.session.commit()
-                    update_log(create_log(request.form['username'], request.remote_addr, 'payment'))
+                    update_log(create_log(current_user.username, request.remote_addr, 'payment'))
                     return redirect(url_for('home'))
                 else:
 
@@ -371,7 +370,7 @@ def payment():
                         else:
                             db.session.delete(product)
                             db.session.commit()
-                    update_log(create_log(request.form['username'], request.remote_addr, 'payment'))
+                    update_log(create_log(current_user.username, request.remote_addr, 'payment'))
                     return redirect(url_for('home'))
 
             hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
@@ -403,7 +402,7 @@ def payment():
                 else:
                     db.session.delete(product)
                     db.session.commit()
-            update_log(create_log(request.form['username'], request.remote_addr, 'payment'))
+            update_log(create_log(current_user.username, request.remote_addr, 'payment'))
             return redirect(url_for('home'))
 
     return render_template('payment.html', title='Payment', form=form, user=user)
