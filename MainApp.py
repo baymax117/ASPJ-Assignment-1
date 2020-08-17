@@ -32,7 +32,7 @@ app.register_blueprint(admin_api, url_prefix='/api/admin_functions')
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
 app.config['JWT_SECRET_KEY'] = 'asp-project-security-api'
-# app.config['WTF_CSRF_ENABLED'] = True
+app.config['WTF_CSRF_ENABLED'] = True
 
 # app.config['CACHE_TYPE'] = 'simple'
 
@@ -40,12 +40,11 @@ app.config["Cache-Control"] = "no-cache, no-store, must-revalidate"
 app.config["Pragma"] = "no-cache"
 app.config['server'] = 'www.cbshop.com'
 app.config['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-# app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SECURE'] = True
 app.config["CACHE_TYPE"] = "null"
 app.config['X-Frame-Options'] = 'SAMEORIGIN'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['X-Content-Type-Options'] = 'nosniff'
-# app.config['SESSION_COOKIE_SECURE'] = True
 
 app.config['SECRET_KEY'] = "asp-project-security"
 cache.init_app(app)
