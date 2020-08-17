@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, sql, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 import json
 from flask_marshmallow import Marshmallow
@@ -229,27 +229,23 @@ class OrderItems(db.Model):
 
 # to update the js file for the shop
 def update_js():
-    statement = sql.text('SELECT * FROM products')
-    result = db.engine.execute(statement)
     data = []
-    for row in result:
-        data.append([row[0], row[1], row[2], row[3], row[4], row[6]])
+    products = Product.query.all()
+    for product in products:
+        data.append([product.product_id, product.product_name, product.product_type, product.product_price, product.product_description, product.product_image])
     data1 = json.dumps(data)
-    print(data1)
 
-    statement = sql.text('SELECT * FROM reviews')
-    result = db.engine.execute(statement)
+    reviews = Reviews.query.all()
     data = []
-    for row in result:
-        search_statement = sql.text('SELECT username FROM users WHERE id = ' + str(row[2]))
-        username = db.engine.execute(search_statement)
-        data.append([row[1], username.fetchone()[0], row[3]])
+    for review in reviews:
+        user = User.query.filter_by(id=review.id).first()
+        data.append([review.product_id, user.username, review.review])
     data2 = json.dumps(data)
     print(data2)
 
     js = open("static/js/Shop.js", 'w')
-    js.write("function createList(){var data = " + "{data}".format(
-        data=data1) + ";return data};" + "function createReview(){var reviews = " + "{data}".format(
-        data=data2) + "; return reviews};")
+    js.write("function createList(){\nvar data = " + "{data}".format(
+        data=data1) + ";\nreturn data;\n}\n" + "function createReview(){\nvar reviews = " + "{data}".format(
+        data=data2) + ";\nreturn reviews;\n}")
     print('js updated')
     js.close()
