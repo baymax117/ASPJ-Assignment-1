@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField
-from wtforms.validators import ValidationError, InputRequired, Email, EqualTo, Length, NumberRange
+from wtforms.validators import ValidationError, InputRequired, Email, EqualTo, Length, NumberRange, DataRequired
 
 
 def validate_name(form, field):
@@ -12,6 +12,7 @@ def validate_name(form, field):
 class UserLoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=50), validate_name])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=50)])
+    token = StringField('Token', validators=[DataRequired(), Length(6, 6)])
     remember_me = BooleanField('Remember Me')
     # submit = SubmitField('Sign In')
 

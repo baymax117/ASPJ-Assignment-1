@@ -18,6 +18,10 @@ import bcrypt
 from flask_wtf import CSRFProtect
 from flask_caching import Cache
 
+import pyqrcode
+from io import BytesIO
+from flask import abort
+
 cache = Cache()
 app = Flask(__name__)
 csrf = CSRFProtect(app)
@@ -172,6 +176,18 @@ def login():
                 update_log(create_log(request.form['username'], request.remote_addr, 'pass'))
                 return redirect(url_for('home'))
 
+            # 2FA
+            if user.verify_totp(form.token.data):
+                login_user(user, remember=form.remember_me.data)
+                user.activate_is_authenticated()
+                db.session.add(user)
+                db.session.commit()
+                session['user'] = request.form['username']
+                # successful attempt
+                session.pop('attempts')
+                update_log(create_log(request.form['username'], request.remote_addr, 'pass'))
+                return redirect(url_for('home'))
+
         # failed attempt
         update_log(create_log(request.form['username'], request.remote_addr, 'fail'))
         session['attempts'] += 1
@@ -226,7 +242,11 @@ def signup():
             db.session.add(newuser)
             db.session.commit()
             flash("You have successfully signed up!")
-            return redirect(url_for('login'))
+            # return redirect(url_for('login'))
+
+            # 2FA - redirect to the two-factor auth page, passing username in session
+            session['username'] = form.username.data
+            return redirect(url_for('two_factor_setup'))
 
         if exists:
             flash("Email exists!")
@@ -445,6 +465,45 @@ def update_profile():
         return redirect(url_for("home"))
     else:
         return render_template('update_profile.html', user=current_user, error=invalid)
+
+
+# 2FA
+@app.route('/twofactor')
+def two_factor_setup():
+    if 'username' not in session:
+        return redirect(url_for('home'))
+    user = User.query.filter_by(username=session['username']).first()
+    if user is None:
+        return redirect(url_for('home'))
+    # since this page contains the sensitive qrcode, make sure the browser
+    # does not cache it
+    return render_template('two-factor-setup.html'), 200, {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'}
+
+
+# 2FA
+@app.route('/qrcode')
+def qrcode():
+    if 'username' not in session:
+        abort(404)
+    user = User.query.filter_by(username=session['username']).first()
+    if user is None:
+        abort(404)
+
+    # for added security, remove username from session
+    del session['username']
+
+    # render qrcode for FreeTOTP
+    url = pyqrcode.create(user.get_totp_uri())
+    stream = BytesIO()
+    url.svg(stream, scale=3)
+    return stream.getvalue(), 200, {
+        'Content-Type': 'image/svg+xml',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'}
 
 
 def reset_database():
