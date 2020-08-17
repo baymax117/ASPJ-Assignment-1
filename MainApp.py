@@ -15,12 +15,12 @@ from api.update_profile import update_profile_api
 import uuid
 import hashlib
 import bcrypt
-from flask_wtf import CSRFProtect
+from flask_wtf import CsrfProtect
 from flask_caching import Cache
 
 cache = Cache()
 app = Flask(__name__)
-csrf = CSRFProtect(app)
+csrf = CsrfProtect(app)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
 app.register_blueprint(update_profile_api, url_prefix='/api/update_profile')
@@ -32,20 +32,20 @@ app.register_blueprint(admin_api, url_prefix='/api/admin_functions')
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
 app.config['JWT_SECRET_KEY'] = 'asp-project-security-api'
-# app.config['WTF_CSRF_ENABLED'] = True
+app.config['WTF_CSRF_ENABLED'] = True
 
 # app.config['CACHE_TYPE'] = 'simple'
 
-app.config["Cache-Control"] = "no-cache, no-store, must-revalidate"
+app.config["Cache-Control"] = "no-cache, no-store"
 app.config["Pragma"] = "no-cache"
 app.config['server'] = 'www.cbshop.com'
 app.config['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-# app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SECURE'] = True
 app.config["CACHE_TYPE"] = "null"
 app.config['X-Frame-Options'] = 'SAMEORIGIN'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['X-Content-Type-Options'] = 'nosniff'
-# app.config['SESSION_COOKIE_SECURE'] = True
+
 
 app.config['SECRET_KEY'] = "asp-project-security"
 cache.init_app(app)
