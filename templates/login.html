@@ -35,7 +35,6 @@
     {% endif %}
 {% endwith %}
 <form method="POST" action="">
-    {{ form.csrf_token }}
         <p>
             {{ form.username.label }} <br>
             {{ form.username(size=32, autocomplete="off") }} <br>
@@ -58,7 +57,7 @@
         <p>
             <a href="{{ url_for('forgotpassword') }}">Forgot password</a>
         </p>
-
+    {{ form.csrf_token }}
 </form>
 {% endblock %}
 

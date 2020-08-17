@@ -123,6 +123,8 @@ class User(db.Model):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True)
+    # username = Column(EncryptedType(Unicode, key, AesEngine, 'pkcs5' ))
+    # username =  Column(EncryptedType(String, key), nullable=True)
     username = Column(String(100))
     email = Column(String(120), index=True, unique=True)
     password = Column(String(128))
@@ -191,6 +193,7 @@ class Payment(db.Model):
     expyear = Column(Integer)
     cvv = Column(Integer)
     id = Column(Integer, ForeignKey('users'))
+    # rememberinfo = Column(Boolean, default=False)
 
 
 class Reviews(db.Model):
@@ -207,6 +210,13 @@ class Cart(db.Model):
     product_id = Column(Integer, primary_key=True)
     quantity = Column(Integer)
     id = Column(Integer, ForeignKey("users"))
+
+
+# class Order(db.Model):
+#     __tablename__ = 'orders'
+#     order_id = Column(Integer, primary_key=True)
+#     card_num = Column(Integer, ForeignKey("cards"))
+#     id = Column(Integer, ForeignKey("users"))
 
 
 class OrderItems(db.Model):
@@ -233,7 +243,7 @@ def update_js():
     data2 = json.dumps(data)
     print(data2)
 
-    js = open("static/js/Shop.js", 'w')
+    js = open("C:/Flask/static/js/Shop.js", 'w')
     js.write("function createList(){\nvar data = " + "{data}".format(
         data=data1) + ";\nreturn data;\n}\n" + "function createReview(){\nvar reviews = " + "{data}".format(
         data=data2) + ";\nreturn reviews;\n}")
