@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, flash, url_for, request, g, session, jsonify
-from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm, ForgetPasswordForm_Security, PaymentForm
+from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm, \
+    ForgetPasswordForm_Security, PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user
 from sqlalchemy.sql import text
 from Database import db, User, UserSchema, Product, Payment, Cart, db_create, db_drop, db_seed, update_js
@@ -32,13 +33,13 @@ app.register_blueprint(admin_api, url_prefix='/api/admin_functions')
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'shop.db')
 app.config['JWT_SECRET_KEY'] = 'asp-project-security-api'
-app.config['WTF_CSRF_ENABLED'] = True
+# app.config['WTF_CSRF_ENABLED'] = True
 
 # app.config['CACHE_TYPE'] = 'simple'
 app.config["Cache-Control"] = "no-cache, no-store"
 app.config["Pragma"] = "no-cache"
 app.config['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-app.config['SESSION_COOKIE_SECURE'] = True
+# app.config['SESSION_COOKIE_SECURE'] = True
 app.config["CACHE_TYPE"] = "null"
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
@@ -78,8 +79,6 @@ def after_request(r):
     return r
 
 
-
-
 @app.route('/dropsession')
 def dropsession():
     session.pop('user', None)
@@ -92,52 +91,39 @@ def load_user(id):
     return User.query.get(int(id))
 
 
+def get_cart_size(user):
+    if user.is_anonymous:
+        return None, 0
+    else:
+        q = Cart.query.filter_by(id=user.id).all()
+        return user, len(q)
+
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    cart_no = 0
-    if current_user.is_anonymous:
-        user = None
-    else:
-        user = current_user
-        statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
-        results = db.engine.execute(statement)
-        for row in results:
-            cart_no += 1
-    statement = text('SELECT * FROM products')
-    results = db.engine.execute(statement)
+    user, cart_no = get_cart_size(current_user)
+    product_list = Product.query.all()
     products = []
     # products -> 0: name | 1: price | 2: image
-    for row in results:
-        products.append([row[1], row[3], row[6]])
-    length = len(products)
-    return render_template('home.html', products=products, length=length, user=user, cart_no=cart_no)
+    for product in product_list:
+        products.append([product.product_name, product.product_price, product.product_image])
+    return render_template('home.html', products=products, length=len(products), user=user, cart_no=cart_no)
 
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-    cart_no = 0
-    if current_user.is_anonymous:
-        user = None
-    else:
-        user = current_user
-        statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
-        results = db.engine.execute(statement)
-        for row in results:
-            cart_no += 1
+    user, cart_no = get_cart_size(current_user)
     if request.args.get('q') == '':
         return redirect(url_for('home'))
     else:
         query = request.args.get('q')
-        statement = text('SELECT * FROM products')
-        results = db.engine.execute(statement)
+        product_list = Product.query.filter(Product.product_name.like('%{}%'.format(query))).all()
         products = []
         # products -> 0: name | 1: price | 2: image
-        for row in results:
-            if query.lower() in row[1].lower():
-                products.append([row[1], row[3], row[6]])
-        length = len(products)
-        return render_template('home_search.html', products=products, length=length, query=query, user=user,
+        for product in product_list:
+            products.append([product.product_name, product.product_price, product.product_image])
+        return render_template('home_search.html', products=products, length=len(products), query=query, user=user,
                                cart_no=cart_no)
 
 
@@ -211,22 +197,14 @@ def signup():
         # email
         hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
         exists = False
-        statement = text("SELECT * FROM users WHERE email = '{}'".format(hashed_email_data))
-        results = db.engine.execute(statement)
-        count = 0
-        for row in results:
-            count += 1
-        if count >= 1:
+        user_list = User.query.filter_by(email=hashed_email_data).all()
+        if len(user_list) >= 1:
             exists = True
 
         # check username
         exists2 = False
-        statement = text("SELECT * FROM users WHERE username = '{}'".format(form.username.data))
-        results = db.engine.execute(statement)
-        count = 0
-        for row in results:
-            count += 1
-        if count >= 1:
+        user_list = User.query.filter_by(username=form.username.data).all()
+        if len(user_list) >= 1:
             exists2 = True
         if not exists and not exists2:
             # bcrypt
@@ -310,23 +288,16 @@ def orders():
 
 @app.route('/cart')
 def cart():
-    cart_no = 0
     cart_list = []
     total_price = 0
-    if current_user is None:
-        user = None
-    else:
-        user = current_user
-        statement = text('SELECT * FROM carts WHERE id = {}'.format(current_user.id))
-        results = db.engine.execute(statement)
-        for row in results:
-            cart_no += 1
-            product = Product.query.filter_by(product_id=row[1]).first()
-            price = row[2] * product.product_price
-            # [product_name, image, price, quantity]
-            cart_list.append([product.product_name, product.product_image, row[2], price, product.product_id])
-        for item in cart_list:
-            total_price += item[3]
+    user, cart_no = get_cart_size(current_user)
+    user_cart = Cart.query.filter_by(id=user.id).all()
+    for item in user_cart:
+        product = Product.query.filter_by(product_id=item.product_id).first()
+        # [product_name, image, price, quantity]
+        cart_list.append([product.product_name, product.product_image, item.quantity, product.product_price, product.product_id])
+    for item in cart_list:
+        total_price += item[3]
     return render_template('cart.html', user=user, cart_no=cart_no, cart_list=cart_list, total=total_price)
 
 
@@ -340,11 +311,9 @@ def payment():
     form = PaymentForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            statement = text('SELECT * FROM cards WHERE id = {}'.format(current_user.id))
-            results = db.engine.execute(statement)
-            for row in results:
-                cards_num = row.cardnum
-                cardlist.append(cards_num)
+            cards = Payment.query.filter_by(id=current_user.id).all()
+            for card in cards:
+                cardlist.append(card.card_num)
             user_card_exist = db.session.query(Payment).filter_by(id=current_user.id).first()
             if user_card_exist:
                 result = False
