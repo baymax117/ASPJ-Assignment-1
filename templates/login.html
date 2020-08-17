@@ -35,8 +35,8 @@
     {% endif %}
 {% endwith %}
 <form method="POST" action="" novalidate>
-        {{ form.hidden_tag() }}
         <p>
+            {{ form.csrf_token }}
             {{ form.username.label }} <br>
             {{ form.username(size=32, autocomplete="off") }} <br>
             {% for error in form.username.errors %}
@@ -44,6 +44,7 @@
             {% endfor %}
         </p>
         <p>
+            {{ form.csrf_token }}
             {{ form.password.label }} <br>
             {{ form.password(size=32, autocomplete="off") }} <br>
             {% for error in form.password.errors %}
