@@ -40,7 +40,7 @@ app.config["Cache-Control"] = "no-cache, no-store"
 app.config["Pragma"] = "no-cache"
 app.config['server'] = 'www.cbshop.com'
 app.config['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-app.config['SESSION_COOKIE_SECURE'] = True
+# app.config['SESSION_COOKIE_SECURE'] = True
 app.config["CACHE_TYPE"] = "null"
 app.config['X-Frame-Options'] = 'SAMEORIGIN'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
@@ -258,7 +258,11 @@ def forgotpassword():
                         if form2.validate_on_submit():
                             update_user = User.query.filter_by(email=hashed_email_data).first()
                             hashed_password = bcrypt.hashpw(form2.newpassword.data.encode(), bcrypt.gensalt(rounds=16))
+                            hashed_security_questions = bcrypt.hashpw(form11.security_questions.data.encode(), bcrypt.gensalt())
+                            hashed_security_answer = bcrypt.hashpw(form11.security_questions_answer.data.encode(), bcrypt.gensalt(rounds=16))
                             update_user.password = hashed_password
+                            update_user.security_questions = hashed_security_questions
+                            update_user.security_questions_answer = hashed_security_answer
                             db.session.commit()
                             flash("You have successfully reset your password")
                             return redirect(url_for('login'))
@@ -267,6 +271,9 @@ def forgotpassword():
                     else:
                         flash("Incorrect security questions answer")
                         return redirect(url_for('forgotpassword'))
+                else:
+                    flash("Incorrect security questions answer")
+                    return redirect(url_for('forgotpassword'))
             return render_template('forgot_password.html', title='Reset Password', form1=form1, form11=form11)
 
         else:
