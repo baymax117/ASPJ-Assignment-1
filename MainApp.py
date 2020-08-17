@@ -2,7 +2,6 @@ from flask import Flask, render_template, redirect, flash, url_for, request, g, 
 from Forms import UserLoginForm, CreateUserForm, ForgetPasswordForm_Email, ForgetPasswordForm, \
     ForgetPasswordForm_Security, PaymentForm
 from flask_login import LoginManager, logout_user, current_user, login_user
-from sqlalchemy.sql import text
 from Database import db, User, UserSchema, Product, Payment, Cart, db_create, db_drop, db_seed, update_js
 from flask_jwt_extended import JWTManager
 import os

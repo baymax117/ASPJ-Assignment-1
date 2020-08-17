@@ -12,12 +12,8 @@ def update():
     if request.method == 'POST':
         new_username = request.form.get('update_username')
         user = User.query.filter_by(public_id=current_user.public_id).first()
-        count = 0
-        statement = text("SELECT * FROM users WHERE username = '{}'".format(new_username))
-        results = db.engine.execute(statement)
-        for row in results:
-            count += 1
-        if count >= 1:
+        username_list = User.query.filter_by(username=new_username).all()
+        if len(username_list) >= 1:
             exist = True
         else:
             exist = False
