@@ -35,7 +35,6 @@
     {% endif %}
 {% endwith %}
 <form method="POST" action="">
-    {{ form.hidden_tag() }}
         <p>
             {{ form.username.label }} <br>
             {{ form.username(size=32, autocomplete="off") }} <br>
@@ -50,6 +49,14 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        <p>
+            {{ form.csrf_token }}
+            {{ form.token.label }} <br>
+            {{ form.token(size=32, autocomplete="off") }} <br>
+            {% for error in form.token.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
         <button type="submit">login!</button>
 
         <p>
@@ -58,7 +65,7 @@
         <p>
             <a href="{{ url_for('forgotpassword') }}">Forgot password</a>
         </p>
-
+    {{ form.csrf_token }}
 </form>
 {% endblock %}
 

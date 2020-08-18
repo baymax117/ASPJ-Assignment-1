@@ -1,9 +1,8 @@
 from flask import Blueprint, request, redirect, url_for
 from flask_login import current_user
 from Database import Reviews
-from sqlalchemy.sql import text
 from Database import db, update_js
-
+import re
 review_api = Blueprint('review_api', __name__)
 
 
@@ -11,21 +10,16 @@ review_api = Blueprint('review_api', __name__)
 def add(product_id):
     if request.method == "POST":
         if current_user is not None:
-            statement = text("SELECT review_id FROM reviews")
-            result = db.engine.execute(statement)
+            review_list = Reviews.query.all()
             maxi = 1
-            for row in result:
-                if row[0] >= maxi:
-                    maxi = row[0] + 1
+            for review in review_list:
+                if review.review_id >= maxi:
+                    maxi = review.review_id + 1
             review = Reviews(review_id=maxi,
                              id=current_user.id,
                              product_id=product_id,
-                             review=request.form['comment'])
+                             review=re.escape(request.form['comment']))
             db.session.add(review)
             db.session.commit()
-            statement = text("SELECT * FROM reviews")
-            result = db.engine.execute(statement)
-            for row in result:
-                print(row)
             update_js()
     return redirect(url_for('home'))

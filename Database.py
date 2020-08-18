@@ -3,7 +3,9 @@ from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 import json
 from flask_marshmallow import Marshmallow
-
+import base64
+import onetimepass
+import os
 
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -123,6 +125,8 @@ class User(db.Model):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True)
+    # username = Column(EncryptedType(Unicode, key, AesEngine, 'pkcs5' ))
+    # username =  Column(EncryptedType(String, key), nullable=True)
     username = Column(String(100))
     email = Column(String(120), index=True, unique=True)
     password = Column(String(128))
@@ -134,6 +138,8 @@ class User(db.Model):
     is_admin = Column(Boolean, default=False)
     user_reviews = relationship("Reviews")
     cart = relationship("Cart")
+
+    otp_secret = Column(String(16))
 
     def __init__(self, public_id ,username, password, email, security_questions, security_questions_answer, is_active,
                  is_authenticated, is_admin):
@@ -147,7 +153,8 @@ class User(db.Model):
         self.is_active = is_active
         self.is_authenticated = is_authenticated
         self.is_admin = is_admin
-
+        # generate a random secret
+        self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
 
     def is_authenticate(self):
         return self.is_authenticated
@@ -170,6 +177,14 @@ class User(db.Model):
     def get_admin(self):
         return self.is_admin
 
+    # for 2FA purposes
+    def get_totp_uri(self):
+        return 'otpauth://totp/2FA-Demo:{0}?secret={1}&issuer=2FA-Demo'.format(self.get_username(), self.otp_secret)
+
+    # for 2FA purposes
+    def verify_totp(self, token):
+        return onetimepass.valid_totp(token, self.otp_secret)
+
 
 class UserSchema(ma.Schema):
     class Meta:
@@ -191,6 +206,7 @@ class Payment(db.Model):
     expyear = Column(Integer)
     cvv = Column(Integer)
     id = Column(Integer, ForeignKey('users'))
+    # rememberinfo = Column(Boolean, default=False)
 
 
 class Reviews(db.Model):
@@ -207,6 +223,13 @@ class Cart(db.Model):
     product_id = Column(Integer, primary_key=True)
     quantity = Column(Integer)
     id = Column(Integer, ForeignKey("users"))
+
+
+# class Order(db.Model):
+#     __tablename__ = 'orders'
+#     order_id = Column(Integer, primary_key=True)
+#     card_num = Column(Integer, ForeignKey("cards"))
+#     id = Column(Integer, ForeignKey("users"))
 
 
 class OrderItems(db.Model):
@@ -233,7 +256,7 @@ def update_js():
     data2 = json.dumps(data)
     print(data2)
 
-    js = open("static/js/Shop.js", 'w')
+    js = open("C:/Flask/static/js/Shop.js", 'w')
     js.write("function createList(){\nvar data = " + "{data}".format(
         data=data1) + ";\nreturn data;\n}\n" + "function createReview(){\nvar reviews = " + "{data}".format(
         data=data2) + ";\nreturn reviews;\n}")

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField
-from wtforms.validators import ValidationError, InputRequired, Email, EqualTo, Length, NumberRange
+from wtforms.validators import ValidationError, InputRequired, Email, EqualTo, Length, NumberRange, DataRequired
 
 
 def validate_name(form, field):
@@ -12,7 +12,9 @@ def validate_name(form, field):
 class UserLoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=50), validate_name])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=50)])
+    token = StringField('Token', validators=[DataRequired(), Length(6, 6)])
     remember_me = BooleanField('Remember Me')
+    # submit = SubmitField('Sign In')
 
 
 class CreateUserForm(FlaskForm):
@@ -27,6 +29,9 @@ class CreateUserForm(FlaskForm):
                                               ('Your\'s pet name', 'Your\'s pet name'),
                                               ('Your favourite food','Your favourite food')])
     security_questions_answer = StringField('Your secret answer', validators=[InputRequired()])
+
+    # confirmPassword = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password')])
+    # submit = SubmitField('Sign up!')
 
 
 class ForgetPasswordForm_Email(FlaskForm):
@@ -43,6 +48,7 @@ class ForgetPasswordForm_Security(FlaskForm):
 
 
 class ForgetPasswordForm(FlaskForm):
+    #security_questions = StringField(label="Security question")
     security_questions = SelectField(label="Security question (if you want to reset, select new questions)",
                                      validators=[InputRequired()],
                                      choices=[('Mother\'s middle name', 'Mother\'s middle name'),
@@ -73,3 +79,4 @@ class PaymentForm(FlaskForm):
     expyear = SelectField(validators=[InputRequired()], choices=[('2025', '25'), ('2016', '24'), ('2023', '23'),
                                                                ('2022', '22'), ('2021', '21'), ('2020', '20')])
     cvv = IntegerField('CVV', validators=[InputRequired(), NumberRange(max=999)])
+    # rmb = BooleanField('')

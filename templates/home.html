@@ -134,9 +134,10 @@ textarea{
                 </div>
                 <div class="row input">
                     <form id="form-review" action="" method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <textarea form="form-review" name="comment"></textarea>
                         <br>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit">Submit</button>
                     </form>
                 </div>

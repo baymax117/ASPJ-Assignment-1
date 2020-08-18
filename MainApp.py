@@ -15,12 +15,16 @@ from api.update_profile import update_profile_api
 import uuid
 import hashlib
 import bcrypt
-from flask_wtf import CsrfProtect
+from flask_wtf import CSRFProtect
 from flask_caching import Cache
+
+import pyqrcode
+from io import BytesIO
+from flask import abort
 
 cache = Cache()
 app = Flask(__name__)
-csrf = CsrfProtect(app)
+csrf = CSRFProtect(app)
 app.register_blueprint(cart_api, url_prefix='/api/Cart')
 app.register_blueprint(review_api, url_prefix='/api/Reviews')
 app.register_blueprint(update_profile_api, url_prefix='/api/update_profile')
@@ -45,7 +49,6 @@ app.config["CACHE_TYPE"] = "null"
 app.config['X-Frame-Options'] = 'SAMEORIGIN'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['X-Content-Type-Options'] = 'nosniff'
-
 
 app.config['SECRET_KEY'] = "asp-project-security"
 cache.init_app(app)
@@ -173,6 +176,18 @@ def login():
                 update_log(create_log(request.form['username'], request.remote_addr, 'pass'))
                 return redirect(url_for('home'))
 
+            # 2FA
+            if user.verify_totp(form.token.data):
+                login_user(user, remember=form.remember_me.data)
+                user.activate_is_authenticated()
+                db.session.add(user)
+                db.session.commit()
+                session['user'] = request.form['username']
+                # successful attempt
+                session.pop('attempts')
+                update_log(create_log(request.form['username'], request.remote_addr, 'pass'))
+                return redirect(url_for('home'))
+
         # failed attempt
         update_log(create_log(request.form['username'], request.remote_addr, 'fail'))
         session['attempts'] += 1
@@ -227,7 +242,11 @@ def signup():
             db.session.add(newuser)
             db.session.commit()
             flash("You have successfully signed up!")
-            return redirect(url_for('login'))
+            # return redirect(url_for('login'))
+
+            # 2FA - redirect to the two-factor auth page, passing username in session
+            session['username'] = form.username.data
+            return redirect(url_for('two_factor_setup'))
 
         if exists:
             flash("Email exists!")
@@ -327,7 +346,7 @@ def payment():
         if form.validate_on_submit():
             cards = Payment.query.filter_by(id=current_user.id).all()
             for card in cards:
-                cardlist.append(card.card_num)
+                cardlist.append(card.cardnum)
             user_card_exist = db.session.query(Payment).filter_by(id=current_user.id).first()
             if user_card_exist:
                 result = False
@@ -345,6 +364,7 @@ def payment():
                         else:
                             db.session.delete(product)
                             db.session.commit()
+                    update_log(create_log(current_user.username, request.remote_addr, 'payment'))
                     return redirect(url_for('home'))
                 else:
 
@@ -377,6 +397,7 @@ def payment():
                         else:
                             db.session.delete(product)
                             db.session.commit()
+                    update_log(create_log(current_user.username, request.remote_addr, 'payment'))
                     return redirect(url_for('home'))
 
             hashed_email_data = hashlib.sha256(form.email.data.encode()).hexdigest()
@@ -408,6 +429,7 @@ def payment():
                 else:
                     db.session.delete(product)
                     db.session.commit()
+            update_log(create_log(current_user.username, request.remote_addr, 'payment'))
             return redirect(url_for('home'))
 
     return render_template('payment.html', title='Payment', form=form, user=user)
@@ -443,6 +465,45 @@ def update_profile():
         return redirect(url_for("home"))
     else:
         return render_template('update_profile.html', user=current_user, error=invalid)
+
+
+# 2FA
+@app.route('/twofactor')
+def two_factor_setup():
+    if 'username' not in session:
+        return redirect(url_for('home'))
+    user = User.query.filter_by(username=session['username']).first()
+    if user is None:
+        return redirect(url_for('home'))
+    # since this page contains the sensitive qrcode, make sure the browser
+    # does not cache it
+    return render_template('two-factor-setup.html'), 200, {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'}
+
+
+# 2FA
+@app.route('/qrcode')
+def qrcode():
+    if 'username' not in session:
+        abort(404)
+    user = User.query.filter_by(username=session['username']).first()
+    if user is None:
+        abort(404)
+
+    # for added security, remove username from session
+    del session['username']
+
+    # render qrcode for FreeTOTP
+    url = pyqrcode.create(user.get_totp_uri())
+    stream = BytesIO()
+    url.svg(stream, scale=3)
+    return stream.getvalue(), 200, {
+        'Content-Type': 'image/svg+xml',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'}
 
 
 def reset_database():

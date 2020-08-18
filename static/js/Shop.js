@@ -3,6 +3,6 @@ var data = [[1, "Surgical Mask 20pcs", "Protective Clothing and Equipment", 10.0
 return data;
 }
 function createReview(){
-var reviews = [[1, "Baymax", "hello"], [1, "Tester", "Good Product"], [3, "Tester", "Nice face shield"], [2, "Baymax", "Good quality"], [4, "Baymax", "Good buy"], [8, "Baymax", "Worth"]];
+var reviews = [[1, "Baymax", "hello"], [1, "Baymax", "<script>alert('xss')</script>"], [1, "Baymax", "<script>alert('xss')</script>"], [1, "Baymax", "<script>alert('xss')</script>"], [1, "Baymax", "<script>alert('xss')</script>"], [1, "Baymax", "<script>alert('xss')</script>"], [7, "Baymax", "It is very comfortable"], [1, "Baymax", "' AND '1'='1' -- "]];
 return reviews;
 }
